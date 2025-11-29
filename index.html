@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Voice Tracker</title>
+    <style>
+        :root {
+            --color-primary: #2185d0;
+            --color-success: #21ba45;
+            --color-danger: #db2828;
+            --color-warning: #fbbd08;
+            --color-text: #333;
+            --color-border: #ddd;
+            --color-bg: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: var(--color-primary);
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .date-display {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+        }
+
+        .input-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .input-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(33, 133, 208, 0.1);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-voice {
+            background: var(--color-success);
+            color: white;
+            grid-column: 1;
+        }
+
+        .btn-voice:hover {
+            background: #16ab39;
+            transform: scale(1.02);
+        }
+
+        .btn-voice.listening {
+            background: var(--color-danger);
+            animation: pulse 0.6s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .btn-manual {
+            background: var(--color-primary);
+            color: white;
+            grid-column: 2;
+        }
+
+        .btn-manual:hover {
+            background: #1678c2;
+        }
+
+        .btn-save {
+            background: var(--color-success);
+            color: white;
+            width: 100%;
+            grid-column: 1 / -1;
+        }
+
+        .btn-save:hover {
+            background: #16ab39;
+        }
+
+        .btn-clear {
+            background: var(--color-border);
+            color: var(--color-text);
+            width: 100%;
+            grid-column: 1 / -1;
+        }
+
+        .btn-clear:hover {
+            background: #ccc;
+        }
+
+        .status-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .transactions-section {
+            margin-top: 20px;
+        }
+
+        .transactions-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 10px;
+        }
+
+        .transaction-count {
+            font-size: 12px;
+            color: #666;
+            margin-top: -8px;
+            margin-bottom: 10px;
+        }
+
+        .transactions-grid {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .transaction-item {
+            padding: 12px;
+            background: #f9f9f9;
+            border-left: 4px solid var(--color-primary);
+            border-radius: 4px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+        }
+
+        .transaction-item.voice {
+            border-left-color: var(--color-success);
+        }
+
+        .transaction-item.manual {
+            border-left-color: var(--color-warning);
+        }
+
+        .transaction-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .transaction-entry {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text);
+            word-break: break-word;
+        }
+
+        .transaction-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .transaction-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            height: fit-content;
+        }
+
+        .transaction-badge.voice {
+            background: rgba(33, 186, 69, 0.1);
+            color: var(--color-success);
+        }
+
+        .transaction-badge.manual {
+            background: rgba(251, 189, 8, 0.1);
+            color: var(--color-warning);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-pagination {
+            padding: 8px 12px;
+            background: var(--color-border);
+            color: var(--color-text);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-pagination:hover:not(:disabled) {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-pagination:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .icon {
+            font-size: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+                border-radius: 0;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            button {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💰 Budget Tracker</h1>
+            <p>Log your expenses easily</p>
+        </div>
+
+        <!-- Date Display -->
+        <div class="date-display" id="dateDisplay"></div>
+
+        <!-- Status Message -->
+        <div class="status-message" id="statusMessage" style="display: none;"></div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="input-label">Add Entry</div>
+
+            <div class="button-group">
+                <button class="btn-voice" id="voiceBtn">
+                    <span class="icon">🎙️</span> Voice
+                </button>
+                <button class="btn-manual" id="manualBtn">
+                    <span class="icon">✏️</span> Manual
+                </button>
+            </div>
+
+            <!-- Voice Input (Hidden) -->
+            <div id="voiceInput" style="display: none;">
+                <div class="input-row full">
+                    <input type="text" id="voiceText" placeholder="Listening..." disabled>
+                </div>
+                <div class="input-row">
+                    <button class="btn-save" id="saveVoiceBtn">Save Voice Entry</button>
+                    <button class="btn-clear" id="cancelVoiceBtn">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Manual Input (Hidden) -->
+            <div id="manualInput" style="display: none;">
+                <div class="input-row full">
+                    <input type="text" id="manualText" placeholder="Enter description (e.g., Groceries, Fuel, etc.)">
+                </div>
+                <div class="input-row">
+                    <input type="number" id="manualAmount" placeholder="Amount" min="0" step="0.01">
+                    <select id="manualCategory">
+                        <option value="Food">🍔 Food</option>
+                        <option value="Transport">🚗 Transport</option>
+                        <option value="Entertainment">🎬 Entertainment</option>
+                        <option value="Shopping">🛍️ Shopping</option>
+                        <option value="Utilities">💡 Utilities</option>
+                        <option value="Other">📌 Other</option>
+                    </select>
+                </div>
+                <div class="input-row">
+                    <button class="btn-save" id="saveManualBtn">Save Entry</button>
+                    <button class="btn-clear" id="cancelManualBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Section -->
+        <div class="transactions-section">
+            <div class="input-label" style="margin-bottom: 15px;">View Entries</div>
+            <div class="button-group" style="margin-bottom: 15px;">
+                <button id="todayBtn" class="btn-manual" style="background: var(--color-success); grid-column: 1;">Today</button>
+                <button id="allBtn" class="btn-manual" style="grid-column: 2;">All Time</button>
+            </div>
+
+            <div class="transactions-header">📋 <span id="entriesTitle">Today's Entries</span></div>
+            <div class="transaction-count" id="transactionCount"></div>
+            <div class="transactions-grid" id="transactionsGrid"></div>
+            <div class="pagination" id="pagination"></div>
+            <div class="pagination-info" id="paginationInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIG & CONSTANTS =====
+        const ENTRIES_PER_PAGE = 5;
+        const STORAGE_KEY = 'budget_entries';
+
+        // ===== STATE =====
+        let recognition = null;
+        let isListening = false;
+        let currentPage = 0;
+        let voiceMode = false;
+        let manualMode = false;
+        let viewMode = 'today'; // 'today' or 'all'
+
+        // ===== INIT =====
+        function init() {
+            setupSpeechRecognition();
+            updateDateDisplay();
+            attachEventListeners();
+            renderTransactions();
+            console.log('Budget Tracker Initialized');
+        }
+
+        // ===== SPEECH RECOGNITION SETUP =====
+        function setupSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                showStatus('Voice input not supported on this device', 'error');
+                document.getElementById('voiceBtn').disabled = true;
+                return;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                document.getElementById('voiceBtn').classList.add('listening');
+                document.getElementById('voiceText').value = 'Listening...';
+            };
+
+            recognition.onresult = (event) => {
+    let interimTranscript = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;  // FIXED
+        if (event.results[i].isFinal) {
+            document.getElementById("voiceText").value = transcript;
+        } else {
+            interimTranscript += transcript;
+        }
+    }
+};
+
+            recognition.onerror = (event) => {
+                showStatus(`Voice error: ${event.error}`, 'error');
+                isListening = false;
+                document.getElementById('voiceBtn').classList.remove('listening');
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                document.getElementById('voiceBtn').classList.remove('listening');
+            };
+        }
+
+        // ===== EVENT LISTENERS =====
+        function attachEventListeners() {
+            document.getElementById('voiceBtn').addEventListener('click', toggleVoiceMode);
+            document.getElementById('manualBtn').addEventListener('click', toggleManualMode);
+            document.getElementById('saveVoiceBtn').addEventListener('click', saveVoiceEntry);
+            document.getElementById('cancelVoiceBtn').addEventListener('click', cancelVoiceMode);
+            document.getElementById('saveManualBtn').addEventListener('click', saveManualEntry);
+            document.getElementById('cancelManualBtn').addEventListener('click', cancelManualMode);
+            document.getElementById('todayBtn').addEventListener('click', () => switchViewMode('today'));
+            document.getElementById('allBtn').addEventListener('click', () => switchViewMode('all'));
+        }
+
+        // ===== VOICE MODE =====
+        function toggleVoiceMode() {
+    if (manualMode) cancelManualMode();
+
+    if (voiceMode) {
+        if (isListening && recognition) recognition.abort();
+        cancelVoiceMode();
+    } else {
+        voiceMode = true;
+        document.getElementById("voiceInput").style.display = "block";
+        document.getElementById("voiceText").value = "";
+
+        if (recognition) {
+            try {
+                recognition.start();
+            } catch (err) {
+                console.error("Speech start error", err);
+                showStatus("Voice error: " + err.message, "error");
+                cancelVoiceMode();
+            }
+        }
+    }
+}
+
+
+        function saveVoiceEntry() {
+            const text = document.getElementById('voiceText').value.trim();
+            if (!text) {
+                showStatus('Please speak something', 'error');
+                return;
+            }
+
+            addEntry(text, 'voice');
+            showStatus('✅ Voice entry saved!', 'success');
+            cancelVoiceMode();
+            renderTransactions();
+        }
+
+        function cancelVoiceMode() {
+            voiceMode = false;
+            if (isListening) recognition.abort();
+            document.getElementById('voiceInput').style.display = 'none';
+            document.getElementById('voiceText').value = '';
+        }
+
+        // ===== MANUAL MODE =====
+        function toggleManualMode() {
+            if (voiceMode) cancelVoiceMode();
+
+            if (manualMode) {
+                cancelManualMode();
+            } else {
+                manualMode = true;
+                document.getElementById('manualInput').style.display = 'block';
+                document.getElementById('manualText').focus();
+            }
+        }
+
+        function saveManualEntry() {
+            const text = document.getElementById('manualText').value.trim();
+            const amount = document.getElementById('manualAmount').value.trim();
+            const category = document.getElementById('manualCategory').value;
+
+            if (!text) {
+                showStatus('Please enter description', 'error');
+                return;
+            }
+
+            const entry = `${text}${amount ? ` - ₹${amount}` : ''} (${category})`;
+            addEntry(entry, 'manual');
+            showStatus('✅ Manual entry saved!', 'success');
+            cancelManualMode();
+            renderTransactions();
+        }
+
+        function cancelManualMode() {
+            manualMode = false;
+            document.getElementById('manualInput').style.display = 'none';
+            document.getElementById('manualText').value = '';
+            document.getElementById('manualAmount').value = '';
+            document.getElementById('manualCategory').value = 'Food';
+        }
+
+        // ===== STORAGE & ENTRY MANAGEMENT =====
+        function getStorageStructure() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : {};
+        }
+
+        function saveToStorage(structure) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(structure));
+        }
+
+        function addEntry(text, type) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            const entry = {
+                id: Date.now(),
+                text: text,
+                type: type,
+                time: time,
+                date: `${year}-${month}-${day}`,
+                timestamp: now.getTime()
+            };
+
+            const structure = getStorageStructure();
+            if (!structure[year]) structure[year] = {};
+            if (!structure[year][month]) structure[year][month] = {};
+            if (!structure[year][month][day]) structure[year][month][day] = [];
+
+            structure[year][month][day].push(entry);
+            saveToStorage(structure);
+        }
+
+        function getTodayEntries() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+
+            const structure = getStorageStructure();
+            const entries = structure[year]?.[month]?.[day] || [];
+            return entries.reverse(); // Show newest first
+        }
+
+        function getAllEntries() {
+            const structure = getStorageStructure();
+            const allEntries = [];
+
+            // Loop through year/month/day structure
+            for (const year in structure) {
+                for (const month in structure[year]) {
+                    for (const day in structure[year][month]) {
+                        allEntries.push(...structure[year][month][day]);
+                    }
+                }
+            }
+
+            return allEntries.sort((a, b) => b.timestamp - a.timestamp); // Newest first
+        }
+
+        function switchViewMode(mode) {
+            viewMode = mode;
+            currentPage = 0;
+            document.getElementById('todayBtn').style.background = mode === 'today' ? 'var(--color-success)' : 'var(--color-primary)';
+            document.getElementById('allBtn').style.background = mode === 'all' ? 'var(--color-success)' : 'var(--color-primary)';
+            document.getElementById('entriesTitle').textContent = mode === 'today' ? "Today's Entries" : 'All Entries';
+            renderTransactions();
+        }
+
+        // ===== RENDER TRANSACTIONS =====
+        function renderTransactions() {
+            const entries = viewMode === 'today' ? getTodayEntries() : getAllEntries();
+            const totalPages = Math.ceil(entries.length / ENTRIES_PER_PAGE);
+            currentPage = Math.min(currentPage, Math.max(0, totalPages - 1));
+
+            const start = currentPage * ENTRIES_PER_PAGE;
+            const end = start + ENTRIES_PER_PAGE;
+            const pageEntries = entries.slice(start, end);
+
+            const grid = document.getElementById('transactionsGrid');
+            const count = document.getElementById('transactionCount');
+            const pagination = document.getElementById('pagination');
+            const paginationInfo = document.getElementById('paginationInfo');
+
+            // Count
+            count.textContent = `Total: ${entries.length} ${viewMode === 'today' ? 'today' : 'all-time'} entries`;
+
+            // Grid
+            if (pageEntries.length === 0) {
+                grid.innerHTML = '<div class="empty-state">No entries yet. Start logging! 📝</div>';
+            } else {
+                grid.innerHTML = pageEntries.map(entry => `
+                    <div class="transaction-item ${entry.type}">
+                        <div class="transaction-text">
+                            <div class="transaction-entry">${escapeHtml(entry.text)}</div>
+                            <div class="transaction-time">${entry.time}</div>
+                        </div>
+                        <div class="transaction-badge ${entry.type}">
+                            ${entry.type === 'voice' ? '🎙️ Voice' : '✏️ Manual'}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Pagination
+            if (totalPages > 1) {
+                pagination.innerHTML = `
+                    <button class="btn-pagination" id="prevBtn" ${currentPage === 0 ? 'disabled' : ''}>← Prev</button>
+                    <button class="btn-pagination" id="nextBtn" ${currentPage === totalPages - 1 ? 'disabled' : ''}>Next →</button>
+                `;
+                document.getElementById('prevBtn')?.addEventListener('click', () => {
+                    currentPage = Math.max(0, currentPage - 1);
+                    renderTransactions();
+                });
+                document.getElementById('nextBtn')?.addEventListener('click', () => {
+                    currentPage = Math.min(totalPages - 1, currentPage + 1);
+                    renderTransactions();
+                });
+            } else {
+                pagination.innerHTML = '';
+            }
+
+            paginationInfo.textContent = totalPages > 0 ? `Page ${currentPage + 1} of ${totalPages}` : '';
+        }
+
+        // ===== UTILITIES =====
+        function updateDateDisplay() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        function showStatus(message, type) {
+            const el = document.getElementById('statusMessage');
+            el.textContent = message;
+            el.className = `status-message ${type}`;
+            el.style.display = 'block';
+            setTimeout(() => {
+                el.style.display = 'none';
+            }, 3000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ===== START =====
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
