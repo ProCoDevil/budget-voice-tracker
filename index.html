@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +34,7 @@
             margin: 0 auto;
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
 
@@ -148,8 +149,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
         }
 
         .btn-manual {
@@ -354,6 +362,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -419,7 +428,8 @@
         <div class="transactions-section">
             <div class="input-label" style="margin-bottom: 15px;">View Entries</div>
             <div class="button-group" style="margin-bottom: 15px;">
-                <button id="todayBtn" class="btn-manual" style="background: var(--color-success); grid-column: 1;">Today</button>
+                <button id="todayBtn" class="btn-manual"
+                    style="background: var(--color-success); grid-column: 1;">Today</button>
                 <button id="allBtn" class="btn-manual" style="grid-column: 2;">All Time</button>
             </div>
 
@@ -443,6 +453,8 @@
         let voiceMode = false;
         let manualMode = false;
         let viewMode = 'today'; // 'today' or 'all'
+        let editingEntryId = null;
+
 
         // ===== INIT =====
         function init() {
@@ -474,16 +486,16 @@
             };
 
             recognition.onresult = (event) => {
-    let interimTranscript = "";
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;  // FIXED
-        if (event.results[i].isFinal) {
-            document.getElementById("voiceText").value = transcript;
-        } else {
-            interimTranscript += transcript;
-        }
-    }
-};
+                let interimTranscript = "";
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;  // FIXED
+                    if (event.results[i].isFinal) {
+                        document.getElementById("voiceText").value = transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+            };
 
             recognition.onerror = (event) => {
                 showStatus(`Voice error: ${event.error}`, 'error');
@@ -511,27 +523,27 @@
 
         // ===== VOICE MODE =====
         function toggleVoiceMode() {
-    if (manualMode) cancelManualMode();
+            if (manualMode) cancelManualMode();
 
-    if (voiceMode) {
-        if (isListening && recognition) recognition.abort();
-        cancelVoiceMode();
-    } else {
-        voiceMode = true;
-        document.getElementById("voiceInput").style.display = "block";
-        document.getElementById("voiceText").value = "";
-
-        if (recognition) {
-            try {
-                recognition.start();
-            } catch (err) {
-                console.error("Speech start error", err);
-                showStatus("Voice error: " + err.message, "error");
+            if (voiceMode) {
+                if (isListening && recognition) recognition.abort();
                 cancelVoiceMode();
+            } else {
+                voiceMode = true;
+                document.getElementById("voiceInput").style.display = "block";
+                document.getElementById("voiceText").value = "";
+
+                if (recognition) {
+                    try {
+                        recognition.start();
+                    } catch (err) {
+                        console.error("Speech start error", err);
+                        showStatus("Voice error: " + err.message, "error");
+                        cancelVoiceMode();
+                    }
+                }
             }
         }
-    }
-}
 
 
         function saveVoiceEntry() {
@@ -568,29 +580,66 @@
         }
 
         function saveManualEntry() {
-            const text = document.getElementById('manualText').value.trim();
-            const amount = document.getElementById('manualAmount').value.trim();
-            const category = document.getElementById('manualCategory').value;
+            const text = document.getElementById("manualText").value.trim();
+            const amount = document.getElementById("manualAmount").value.trim();
+            const category = document.getElementById("manualCategory").value;
 
             if (!text) {
-                showStatus('Please enter description', 'error');
+                showStatus("Please enter description", "error");
                 return;
             }
 
-            const entry = `${text}${amount ? ` - ₹${amount}` : ''} (${category})`;
-            addEntry(entry, 'manual');
-            showStatus('✅ Manual entry saved!', 'success');
+            // Standard display text
+            const displayText = amount ? `${text} - ₹${amount} (${category})` : text;
+
+            if (!editingEntryId) {
+                // New entry
+                addEntry(displayText, "manual");
+                showStatus("Manual entry saved!", "success");
+            } else {
+                // Edit existing entry
+                const structure = getStorageStructure();
+                if (structure) {
+                    // find entry by id in whole structure
+                    outer: for (const year in structure) {
+                        for (const month in structure[year]) {
+                            for (const day in structure[year][month]) {
+                                const list = structure[year][month][day];
+                                const idx = list.findIndex(e => e.id === editingEntryId);
+                                if (idx !== -1) {
+                                    list[idx].text = displayText;
+                                    list[idx].amount = amount || "";
+                                    list[idx].category = category;
+                                    // time/date/timestamp same rehne do
+                                    saveToStorage(structure);
+                                    break outer;
+                                }
+                            }
+                        }
+                    }
+                }
+                showStatus("Entry updated!", "success");
+            }
+
             cancelManualMode();
             renderTransactions();
         }
 
+
         function cancelManualMode() {
             manualMode = false;
-            document.getElementById('manualInput').style.display = 'none';
-            document.getElementById('manualText').value = '';
-            document.getElementById('manualAmount').value = '';
-            document.getElementById('manualCategory').value = 'Food';
+            editingEntryId = null; // reset edit state
+            document.getElementById("manualInput").style.display = "none";
+            document.getElementById("manualText").value = "";
+            document.getElementById("manualAmount").value = "";
+            document.getElementById("manualCategory").value = "Food";
+
+            const saveBtn = document.getElementById("saveManualBtn");
+            if (saveBtn) {
+                saveBtn.textContent = "Save Entry";
+            }
         }
+
 
         // ===== STORAGE & ENTRY MANAGEMENT =====
         function getStorageStructure() {
@@ -654,6 +703,93 @@
             return allEntries.sort((a, b) => b.timestamp - a.timestamp); // Newest first
         }
 
+        function deleteEntryById(id, date) {
+            const structure = getStorageStructure();
+            if (!structure) return;
+
+            // date is "YYYY-MM-DD"
+            const [year, month, day] = date.split("-");
+
+            if (!structure[year] || !structure[year][month] || !structure[year][month][day]) {
+                return;
+            }
+
+            const list = structure[year][month][day];
+            const index = list.findIndex(e => e.id === id);
+            if (index === -1) return;
+
+            list.splice(index, 1); // remove entry
+
+            // agar day array empty ho gaya to clean up optionally:
+            if (list.length === 0) {
+                delete structure[year][month][day];
+                if (Object.keys(structure[year][month]).length === 0) {
+                    delete structure[year][month];
+                    if (Object.keys(structure[year]).length === 0) {
+                        delete structure[year];
+                    }
+                }
+            }
+
+            saveToStorage(structure);
+        }
+        function confirmDeleteEntry(id, date) {
+            const ok = confirm("Delete this entry?");
+            if (!ok) return;
+
+            deleteEntryById(id, date);
+            showStatus("Entry deleted", "success");
+            renderTransactions();
+        }
+
+        function startEditEntry(id, date) {
+            const structure = getStorageStructure();
+            if (!structure) return;
+
+            const [year, month, day] = date.split("-");
+            const list = structure[year]?.[month]?.[day];
+            if (!list) return;
+
+            const entry = list.find(e => e.id === id);
+            if (!entry) return;
+
+            // Set global editing state
+            editingEntryId = id;
+
+            // Open manual mode UI
+            if (voiceMode) cancelVoiceMode();
+            manualMode = true;
+            document.getElementById("manualInput").style.display = "block";
+
+            // Pre-fill fields
+            const descInput = document.getElementById("manualText");
+            const amountInput = document.getElementById("manualAmount");
+            const categorySelect = document.getElementById("manualCategory");
+
+            // If amount field exists, keep it, otherwise just put whole text as description
+            let description = entry.text;
+            if (entry.amount) {
+                // try to remove " - ₹amount (Category)" pattern if present
+                const amountStr = String(entry.amount);
+                const idx = entry.text.indexOf(amountStr);
+                if (idx > 0) {
+                    description = entry.text.slice(0, idx).replace(/[-₹(]/g, "").trim();
+                }
+            }
+
+            descInput.value = description || "";
+            amountInput.value = entry.amount || "";
+            categorySelect.value = entry.category || "Food";
+
+            descInput.focus();
+
+            // Change save button text to indicate edit mode (optional)
+            const saveBtn = document.getElementById("saveManualBtn");
+            if (saveBtn) {
+                saveBtn.textContent = "Save Changes";
+            }
+        }
+
         function switchViewMode(mode) {
             viewMode = mode;
             currentPage = 0;
@@ -686,16 +822,31 @@
                 grid.innerHTML = '<div class="empty-state">No entries yet. Start logging! 📝</div>';
             } else {
                 grid.innerHTML = pageEntries.map(entry => `
-                    <div class="transaction-item ${entry.type}">
-                        <div class="transaction-text">
-                            <div class="transaction-entry">${escapeHtml(entry.text)}</div>
-                            <div class="transaction-time">${entry.time}</div>
-                        </div>
-                        <div class="transaction-badge ${entry.type}">
-                            ${entry.type === 'voice' ? '🎙️ Voice' : '✏️ Manual'}
-                        </div>
-                    </div>
-                `).join('');
+    <div class="transaction-item ${entry.type}">
+        <div class="transaction-text">
+            <div class="transaction-entry">${escapeHtml(entry.text)}</div>
+            <div class="transaction-time">${entry.date} • ${entry.time}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+            <div class="transaction-badge ${entry.type}">
+                ${entry.type === "voice" ? "Voice" : "Manual"}
+            </div>
+            <div style="font-size:11px; color:#666; display:flex; gap:8px;">
+                <button 
+                    style="border:none;background:none;color:#2185d0;cursor:pointer;padding:0;"
+                    onclick="startEditEntry(${entry.id}, '${entry.date}')">
+                    ✏️ Edit
+                </button>
+                <span style="color:#ccc;">|</span>
+                <button 
+                    style="border:none;background:none;color:#db2828;cursor:pointer;padding:0;"
+                    onclick="confirmDeleteEntry(${entry.id}, '${entry.date}')">
+                    🗑️ Delete
+                </button>
+            </div>
+        </div>
+    </div>
+`).join("");
             }
 
             // Pagination
@@ -746,4 +897,5 @@
         window.addEventListener('load', init);
     </script>
 </body>
+
 </html>
