@@ -64,6 +64,7 @@
             animation: shimmer 1.5s infinite;
         }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .progress-bar { transition: width 1s ease-out; }
     </style>
 </head>
 <body class="h-screen w-full flex justify-center bg-gray-100 dark:bg-black text-dark dark:text-white transition-colors duration-300">
@@ -93,14 +94,25 @@
             <!-- Dashboard Card -->
             <div class="bg-white dark:bg-darkSurface rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-none border border-gray-50 dark:border-gray-800 text-center relative overflow-hidden transition-colors duration-300">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-blue-500"></div>
-                <h1 class="text-subtext dark:text-gray-400 text-sm font-medium mb-1">Monthly Budget Overview</h1>
-                <div class="text-4xl font-bold text-dark dark:text-white mb-2 tracking-tight">
-                    <span id="entriesTitle">Today</span>
+                
+                <h1 class="text-subtext dark:text-gray-400 text-sm font-medium mb-1">Monthly Overview</h1>
+                
+                <!-- Big Total -->
+                <div class="text-4xl font-bold text-dark dark:text-white mb-2 tracking-tight flex justify-center items-baseline gap-1">
+                    <span class="text-lg text-gray-400 font-normal">₹</span>
+                    <span id="totalSpentDisplay">0</span>
                 </div>
-                <div id="transactionCount" class="text-sm text-green-500 font-medium bg-green-50 dark:bg-green-900/30 inline-block px-3 py-1 rounded-full">
-                    Loading...
+
+                <!-- Budget Progress Bar -->
+                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mb-2 overflow-hidden relative">
+                    <div id="budgetProgressBar" class="bg-blue-500 h-2 rounded-full progress-bar" style="width: 0%"></div>
                 </div>
-                <div class="flex mt-6 bg-gray-100 dark:bg-black p-1 rounded-xl transition-colors duration-300">
+                <div class="flex justify-between text-[10px] text-gray-400 font-medium mb-4">
+                    <span>Spent</span>
+                    <span id="budgetLimitDisplay">Limit: ₹∞</span>
+                </div>
+                
+                <div class="flex mt-2 bg-gray-100 dark:bg-black p-1 rounded-xl transition-colors duration-300">
                     <button id="todayBtn" class="flex-1 py-2 text-xs font-semibold rounded-lg shadow-sm bg-white dark:bg-darkSurface text-dark dark:text-white transition-all">Today</button>
                     <button id="allBtn" class="flex-1 py-2 text-xs font-medium text-gray-500 dark:text-gray-500 hover:text-dark dark:hover:text-gray-300 transition-all">All Time</button>
                 </div>
@@ -112,9 +124,16 @@
 
         <!-- Transactions List -->
         <div class="flex-1 overflow-y-auto px-6 pb-24 no-scrollbar bg-white dark:bg-dark transition-colors duration-300">
-            <h3 class="font-bold text-lg mb-4 text-dark dark:text-white flex items-center gap-2">
-                Recent Transactions
-            </h3>
+            
+            <div class="flex items-baseline justify-between mb-4">
+                <h3 id="entriesTitle" class="font-bold text-lg text-dark dark:text-white flex items-center gap-2">
+                    Recent Transactions
+                </h3>
+                <span id="transactionCount" class="text-xs text-gray-400">
+                    0 Entries
+                </span>
+            </div>
+
             <div id="transactionsGrid" class="space-y-3"></div>
             <div id="pagination" class="flex justify-center gap-4 mt-6 mb-4"></div>
             <div id="paginationInfo" class="text-center text-xs text-gray-400 pb-4"></div>
@@ -122,25 +141,19 @@
 
         <!-- Bottom Navigation -->
         <div class="absolute bottom-0 w-full bg-white dark:bg-darkSurface border-t border-gray-100 dark:border-gray-800 px-6 py-4 flex justify-between items-center text-gray-400 text-[10px] font-medium z-20 transition-colors duration-300">
-            <!-- Home (Active Blue) -->
             <div class="flex flex-col items-center text-blue-600 dark:text-blue-400 cursor-pointer transition-colors" onclick="window.location.reload()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
                 Home
             </div>
-            <!-- Analytics -->
             <div id="analyticsBtn" class="flex flex-col items-center hover:text-purple-600 dark:hover:text-purple-400 cursor-pointer transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                 <span class="flex items-center gap-1">Analytics ✨</span>
             </div>
             <div class="w-12"></div> 
-            
-            <!-- Categories (Inactive Gray) -->
             <div id="categoriesNavBtn" class="flex flex-col items-center hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                 Categories
             </div>
-            
-            <!-- Settings -->
             <div id="settingsNavBtn" class="flex flex-col items-center hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 Settings
@@ -153,8 +166,6 @@
         </button>
 
         <!-- Modals -->
-        
-        <!-- Voice Input Modal -->
         <div id="voiceInput" class="hidden absolute inset-0 z-40">
             <div class="absolute inset-0 modal-overlay" onclick="document.getElementById('cancelVoiceBtn').click()"></div>
             <div class="absolute bottom-0 w-full bg-white dark:bg-darkSurface rounded-t-3xl p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] animate-slide-up transition-colors duration-300">
@@ -177,13 +188,11 @@
             </div>
         </div>
 
-        <!-- Manual Input Modal (COMPACTED UI FIX) -->
         <div id="manualInput" class="hidden absolute inset-0 z-40">
             <div class="absolute inset-0 modal-overlay" onclick="document.getElementById('cancelManualBtn').click()"></div>
             <div class="absolute bottom-0 w-full bg-white dark:bg-darkSurface rounded-t-3xl p-4 pb-8 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-colors duration-300">
                 <div class="w-12 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
                 <h3 class="font-bold text-lg mb-4 dark:text-white">Add Transaction</h3>
-                <!-- Reduced vertical spacing from space-y-4 to space-y-3 and padding from p-4 to p-3 -->
                 <div class="space-y-3">
                     <div>
                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Description</label>
@@ -207,12 +216,10 @@
                     <button id="cancelManualBtn" class="py-3 rounded-xl bg-gray-100 dark:bg-gray-700 font-semibold text-gray-600 dark:text-gray-300">Cancel</button>
                     <button id="saveManualBtn" class="py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-lg shadow-blue-200 dark:shadow-none">Save Entry</button>
                 </div>
-                <!-- Extra safe area padding at bottom -->
                 <div class="h-4"></div>
             </div>
         </div>
 
-        <!-- Categories Manager -->
         <div id="categoriesModal" class="hidden absolute inset-0 z-50">
             <div class="absolute inset-0 modal-overlay" onclick="closeCategoryManager()"></div>
             <div class="absolute bottom-0 w-full h-[90vh] bg-white dark:bg-darkSurface rounded-t-3xl p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-colors duration-300 flex flex-col">
@@ -226,7 +233,6 @@
             </div>
         </div>
 
-        <!-- Add Category Modal -->
         <div id="addCategoryModal" class="hidden absolute inset-0 z-[60]">
             <div class="absolute inset-0 bg-white dark:bg-darkSurface p-6 flex flex-col h-full transition-colors duration-300">
                 <div class="flex items-center gap-4 mb-6">
@@ -250,45 +256,79 @@
             </div>
         </div>
 
-        <!-- AI Insights Modal -->
+        <!-- AI Insights Modal (NOW WITH DONUT CHART) -->
         <div id="insightsModal" class="hidden absolute inset-0 z-50">
             <div class="absolute inset-0 modal-overlay" onclick="closeInsights()"></div>
-            <div class="absolute bottom-0 w-full h-[85vh] bg-white dark:bg-darkSurface rounded-t-3xl p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-colors duration-300 flex flex-col">
+            <div class="absolute bottom-0 w-full h-[90vh] bg-white dark:bg-darkSurface rounded-t-3xl p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-colors duration-300 flex flex-col">
                 <div class="w-12 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
                 <div class="flex items-center gap-2 mb-4">
-                    <h3 class="font-bold text-xl dark:text-white">Spending Insights</h3>
+                    <h3 class="font-bold text-xl dark:text-white">Analytics</h3>
                     <span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 text-xs rounded-full font-bold">AI Beta</span>
                 </div>
-                <div id="insightsContent" class="flex-1 overflow-y-auto bg-gray-50 dark:bg-darkInput rounded-xl p-4 text-sm leading-relaxed text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-800"></div>
+                
+                <div class="flex-1 overflow-y-auto pr-1 no-scrollbar">
+                    
+                    <!-- 1. AI Text Content (Top) -->
+                    <div id="insightsContent" class="mb-6 bg-purple-50 dark:bg-purple-900/10 rounded-xl p-4 text-sm leading-relaxed text-gray-700 dark:text-gray-300 border border-purple-100 dark:border-purple-900/20"></div>
+
+                    <!-- 2. Donut Chart Container -->
+                    <div id="spendingVisuals" class="mb-6 flex flex-col items-center">
+                        <div class="relative w-64 h-64 mb-6">
+                            <canvas id="budgetChart" width="256" height="256"></canvas>
+                            <!-- Center Text -->
+                            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span class="text-xs text-gray-400">Total</span>
+                                <span id="chartTotal" class="text-2xl font-bold text-dark dark:text-white">₹0</span>
+                            </div>
+                        </div>
+                        <!-- Legend Container -->
+                        <div id="chartLegend" class="w-full space-y-3"></div>
+                    </div>
+
+                </div>
                 <button onclick="closeInsights()" class="mt-4 w-full py-3 rounded-xl bg-gray-100 dark:bg-gray-700 font-semibold text-gray-600 dark:text-gray-300">Close</button>
             </div>
         </div>
 
-        <!-- Settings Modal -->
         <div id="settingsModal" class="hidden absolute inset-0 z-50">
             <div class="absolute inset-0 modal-overlay" onclick="closeSettings()"></div>
-            <div class="absolute bottom-0 w-full h-[60vh] bg-white dark:bg-darkSurface rounded-t-3xl p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-colors duration-300 flex flex-col">
+            <div class="absolute bottom-0 w-full h-[75vh] bg-white dark:bg-darkSurface rounded-t-3xl p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-colors duration-300 flex flex-col">
                 <div class="w-12 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
                 <h3 class="font-bold text-xl dark:text-white mb-6">Settings</h3>
-                <div class="space-y-6 flex-1">
+                <div class="space-y-6 flex-1 overflow-y-auto">
                     <div>
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Gemini API Key</label>
-                        <p class="text-[10px] text-gray-400 mb-2">Required for AI features. Get it from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-500 underline">Google AI Studio</a>.</p>
-                        <input type="password" id="apiKeyInput" placeholder="Paste AIza... key here" class="w-full p-4 bg-gray-50 dark:bg-darkInput rounded-xl text-dark dark:text-white font-medium border-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 mt-1 transition-colors">
+                        <h4 class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-3">Preferences</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Gemini API Key</label>
+                                <input type="password" id="apiKeyInput" placeholder="Paste AIza... key here" class="w-full p-4 bg-gray-50 dark:bg-darkInput rounded-xl text-dark dark:text-white font-medium border-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 mt-1 transition-colors">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Monthly Budget Limit</label>
+                                <input type="number" id="budgetLimitInput" placeholder="e.g. 10000" class="w-full p-4 bg-gray-50 dark:bg-darkInput rounded-xl text-dark dark:text-white font-medium border-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 mt-1 transition-colors">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-3">Data Management</h4>
+                        <div class="space-y-3">
+                            <button onclick="exportData()" class="w-full py-3 rounded-xl bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-semibold flex items-center justify-center gap-2"><span>📥 Export Data (CSV)</span></button>
+                             <button onclick="resetApp()" class="w-full py-3 rounded-xl bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 font-semibold flex items-center justify-center gap-2"><span>🗑️ Reset All Data</span></button>
+                        </div>
                     </div>
                 </div>
-                <button onclick="saveSettings()" class="w-full py-4 rounded-xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-200 dark:shadow-none mb-4">Save Settings</button>
+                <button onclick="saveSettings()" class="w-full py-4 rounded-xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-200 dark:shadow-none mb-4 mt-4">Save Settings</button>
             </div>
         </div>
 
     </div>
 
     <script>
-        // CONSTANTS
         const ENTRIES_PER_PAGE = 5;
         const STORAGE_KEY = 'budget_entries';
         const CATEGORIES_KEY = 'budget_categories';
         const API_KEY_STORAGE = 'gemini_api_key';
+        const BUDGET_LIMIT_KEY = 'budget_limit';
 
         const DEFAULT_CATEGORIES = [
             { id: '1', name: 'Food', icon: '🍔', type: 'emoji' },
@@ -299,7 +339,18 @@
             { id: '6', name: 'Other', icon: '📌', type: 'emoji' }
         ];
 
-        // STATE
+        // Pretty colors for chart
+        const CHART_COLORS = [
+            '#8B5CF6', // Purple
+            '#3B82F6', // Blue
+            '#10B981', // Emerald
+            '#F59E0B', // Amber
+            '#EF4444', // Red
+            '#EC4899', // Pink
+            '#6366F1', // Indigo
+            '#14B8A6'  // Teal
+        ];
+
         let recognition = null;
         let isListening = false;
         let currentPage = 0;
@@ -311,6 +362,7 @@
         let editingCategoryId = null;
         let currentGeneratedIcon = null;
         let apiKey = localStorage.getItem(API_KEY_STORAGE) || "";
+        let monthlyLimit = parseFloat(localStorage.getItem(BUDGET_LIMIT_KEY)) || 0;
 
         function init() {
             initTheme();
@@ -319,85 +371,73 @@
             updateDateDisplay();
             attachEventListeners();
             renderTransactions();
+            updateDashboardCard();
             console.log('Budget Tracker Initialized');
         }
 
-        // SETTINGS LOGIC
         function openSettings() {
             document.getElementById('settingsModal').classList.remove('hidden');
             document.getElementById('apiKeyInput').value = apiKey;
+            document.getElementById('budgetLimitInput').value = monthlyLimit || '';
         }
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.add('hidden');
-        }
+        function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
         function saveSettings() {
-            const val = document.getElementById('apiKeyInput').value.trim();
-            if(!val) { alert('Please enter a valid key'); return; }
-            apiKey = val;
+            const keyVal = document.getElementById('apiKeyInput').value.trim();
+            const budgetVal = parseFloat(document.getElementById('budgetLimitInput').value.trim());
+            if(keyVal) apiKey = keyVal;
             localStorage.setItem(API_KEY_STORAGE, apiKey);
+            monthlyLimit = isNaN(budgetVal) ? 0 : budgetVal;
+            localStorage.setItem(BUDGET_LIMIT_KEY, monthlyLimit);
             closeSettings();
+            updateDashboardCard();
             showStatus('Settings Saved!', 'success');
         }
-
-        // GEMINI CALL
-        async function callGemini(prompt) {
-            if (!apiKey) {
-                if(confirm("AI Key Missing. Open Settings to add it?")) openSettings();
-                throw new Error("No API Key");
+        function exportData() {
+            const entries = getAllEntries();
+            if(entries.length === 0) return alert("No data to export.");
+            let csv = "Date,Time,Description,Category,Amount\n";
+            entries.forEach(e => { csv += `${e.date},${e.time},"${e.description || e.text}",${e.category},${e.amount}\n`; });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.setAttribute('hidden', ''); a.setAttribute('href', url); a.setAttribute('download', 'budget_data.csv');
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+        function resetApp() {
+            if(confirm("CRITICAL WARNING: This will delete ALL transactions and custom categories permanently. Proceed?")) {
+                localStorage.clear();
+                window.location.reload();
             }
+        }
+
+        async function callGemini(prompt) {
+            if (!apiKey) { if(confirm("AI Key Missing. Open Settings to add it?")) openSettings(); throw new Error("No API Key"); }
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
                 if (!response.ok) throw new Error('API request failed');
-                const data = await response.json();
-                return data.candidates[0].content.parts[0].text;
-            } catch (error) {
-                console.error("Gemini Error:", error);
-                throw error;
-            }
+                const data = await response.json(); return data.candidates[0].content.parts[0].text;
+            } catch (error) { console.error("Gemini Error:", error); throw error; }
         }
 
-        // CATEGORIES
         function loadCategories() {
             const stored = localStorage.getItem(CATEGORIES_KEY);
-            if (stored) categories = JSON.parse(stored);
-            else { categories = [...DEFAULT_CATEGORIES]; saveCategories(); }
+            if (stored) categories = JSON.parse(stored); else { categories = [...DEFAULT_CATEGORIES]; saveCategories(); }
             updateCategoryDropdowns();
         }
-        function saveCategories() {
-            localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
-            updateCategoryDropdowns();
-        }
+        function saveCategories() { localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories)); updateCategoryDropdowns(); }
         function updateCategoryDropdowns() {
             const select = document.getElementById('manualCategory');
             if(!select) return;
             select.innerHTML = categories.map(cat => `<option value="${cat.name}">${cat.type === 'svg' ? '🎨' : cat.icon} ${cat.name}</option>`).join('');
         }
-        function openCategoryManager() {
-            renderCategoryList();
-            document.getElementById('categoriesModal').classList.remove('hidden');
-        }
-        function closeCategoryManager() {
-            document.getElementById('categoriesModal').classList.add('hidden');
-        }
+        function openCategoryManager() { renderCategoryList(); document.getElementById('categoriesModal').classList.remove('hidden'); }
+        function closeCategoryManager() { document.getElementById('categoriesModal').classList.add('hidden'); }
         function renderCategoryList() {
             const list = document.getElementById('categoryListContainer');
             list.innerHTML = categories.map(cat => {
                 const iconHtml = cat.type === 'svg' ? `<div class="w-8 h-8 rounded-full overflow-hidden">${cat.icon}</div>` : `<span class="text-xl">${cat.icon}</span>`;
-                return `
-                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center shadow-sm">${iconHtml}</div>
-                        <span class="font-medium text-dark dark:text-white">${cat.name}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="editCategory('${cat.id}')" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg">✏️</button>
-                        <button onclick="deleteCategory('${cat.id}')" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg">🗑️</button>
-                    </div>
-                </div>`;
+                return `<div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center shadow-sm">${iconHtml}</div><span class="font-medium text-dark dark:text-white">${cat.name}</span></div><div class="flex gap-2"><button onclick="editCategory('${cat.id}')" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg">✏️</button><button onclick="deleteCategory('${cat.id}')" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg">🗑️</button></div></div>`;
             }).join('');
         }
         function openAddCategoryModal(catId = null) {
@@ -409,16 +449,8 @@
             modal.classList.remove('hidden');
             if (catId) {
                 const cat = categories.find(c => c.id === catId);
-                title.textContent = "Edit Category";
-                nameInput.value = cat.name;
-                currentGeneratedIcon = { icon: cat.icon, type: cat.type };
-                preview.innerHTML = cat.type === 'svg' ? cat.icon : cat.icon;
-            } else {
-                title.textContent = "New Category";
-                nameInput.value = "";
-                currentGeneratedIcon = null;
-                preview.textContent = "❓";
-            }
+                title.textContent = "Edit Category"; nameInput.value = cat.name; currentGeneratedIcon = { icon: cat.icon, type: cat.type }; preview.innerHTML = cat.type === 'svg' ? cat.icon : cat.icon;
+            } else { title.textContent = "New Category"; nameInput.value = ""; currentGeneratedIcon = null; preview.textContent = "❓"; }
         }
         function closeAddCategoryModal() { document.getElementById('addCategoryModal').classList.add('hidden'); }
         async function generateCategoryIcon() {
@@ -432,15 +464,8 @@
                 let svg = await callGemini(prompt);
                 svg = svg.replace(/```xml/g, '').replace(/```svg/g, '').replace(/```/g, '').trim();
                 if(!svg.startsWith('<svg')) throw new Error("Invalid SVG");
-                preview.innerHTML = svg;
-                currentGeneratedIcon = { icon: svg, type: 'svg' };
-            } catch (err) {
-                console.error(err);
-                alert("AI generation failed or cancelled.");
-                preview.textContent = "✨"; currentGeneratedIcon = { icon: "✨", type: "emoji" };
-            } finally {
-                btn.disabled = false; btn.innerHTML = `<span>✨ Generate Icon (AI)</span>`;
-            }
+                preview.innerHTML = svg; currentGeneratedIcon = { icon: svg, type: 'svg' };
+            } catch (err) { console.error(err); alert("AI generation failed or cancelled."); preview.textContent = "✨"; currentGeneratedIcon = { icon: "✨", type: "emoji" }; } finally { btn.disabled = false; btn.innerHTML = `<span>✨ Generate Icon (AI)</span>`; }
         }
         function saveCategory() {
             const name = document.getElementById('newCategoryName').value.trim();
@@ -448,33 +473,18 @@
             if (editingCategoryId) {
                 const idx = categories.findIndex(c => c.id === editingCategoryId);
                 if(idx !== -1) { categories[idx].name = name; categories[idx].icon = currentGeneratedIcon.icon; categories[idx].type = currentGeneratedIcon.type; }
-            } else {
-                categories.push({ id: Date.now().toString(), name: name, icon: currentGeneratedIcon.icon, type: currentGeneratedIcon.type });
-            }
+            } else { categories.push({ id: Date.now().toString(), name: name, icon: currentGeneratedIcon.icon, type: currentGeneratedIcon.type }); }
             saveCategories(); closeAddCategoryModal(); renderCategoryList(); renderTransactions();
         }
         function editCategory(id) { openAddCategoryModal(id); }
-        function deleteCategory(id) {
-            if(!confirm("Delete category?")) return;
-            categories = categories.filter(c => c.id !== id);
-            saveCategories(); renderCategoryList();
-        }
+        function deleteCategory(id) { if(!confirm("Delete category?")) return; categories = categories.filter(c => c.id !== id); saveCategories(); renderCategoryList(); }
 
-        // MAIN FEATURES
         function setupSpeechRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) { document.getElementById('voiceBtn').disabled = true; return; }
-            recognition = new SpeechRecognition();
-            recognition.continuous = false; recognition.interimResults = true; recognition.lang = 'en-US';
+            recognition = new SpeechRecognition(); recognition.continuous = false; recognition.interimResults = true; recognition.lang = 'en-US';
             recognition.onstart = () => { isListening = true; document.getElementById('voiceBtn').classList.add('listening'); document.getElementById('voiceText').value = 'Listening...'; };
-            recognition.onresult = (event) => {
-                let interimTranscript = "";
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) document.getElementById("voiceText").value = transcript;
-                    else interimTranscript += transcript;
-                }
-            };
+            recognition.onresult = (event) => { let interimTranscript = ""; for (let i = event.resultIndex; i < event.results.length; i++) { const transcript = event.results[i][0].transcript; if (event.results[i].isFinal) document.getElementById("voiceText").value = transcript; else interimTranscript += transcript; } };
             recognition.onend = () => { isListening = false; document.getElementById('voiceBtn').classList.remove('listening'); };
         }
         function attachEventListeners() {
@@ -494,9 +504,7 @@
         async function processVoiceEntryWithAI() {
             const text = document.getElementById('voiceText').value.trim();
             if (!text || text === "Listening...") return showStatus('Please speak something', 'error');
-            document.getElementById('voiceStatusContainer').classList.add('hidden');
-            document.getElementById('aiProcessing').classList.remove('hidden');
-            document.getElementById('saveVoiceBtn').disabled = true;
+            document.getElementById('voiceStatusContainer').classList.add('hidden'); document.getElementById('aiProcessing').classList.remove('hidden'); document.getElementById('saveVoiceBtn').disabled = true;
             try {
                 const availableCats = categories.map(c => c.name).join(', ');
                 const prompt = `Analyze transaction: "${text}". Extract: 1. Description, 2. Amount, 3. Category (match [${availableCats}] or 'Other'). Return JSON: {"description": "...", "amount": 0.00, "category": "..."}.`;
@@ -508,40 +516,117 @@
                 const select = document.getElementById('manualCategory');
                 if ([...select.options].some(o => o.value === data.category)) select.value = data.category;
                 showStatus('✨ Parsed with AI!', 'success');
-            } catch (err) {
-                console.error(err); showStatus("AI failed, switching to manual", "error"); cancelVoiceMode(); toggleManualMode(); document.getElementById('manualText').value = text;
-            } finally {
-                document.getElementById('voiceStatusContainer').classList.remove('hidden'); document.getElementById('aiProcessing').classList.add('hidden'); document.getElementById('saveVoiceBtn').disabled = false;
-            }
+            } catch (err) { console.error(err); showStatus("AI failed, switching to manual", "error"); cancelVoiceMode(); toggleManualMode(); document.getElementById('manualText').value = text; } finally { document.getElementById('voiceStatusContainer').classList.remove('hidden'); document.getElementById('aiProcessing').classList.add('hidden'); document.getElementById('saveVoiceBtn').disabled = false; }
         }
+        
+        // --- NEW ANALYTICS WITH CHART ---
         async function openInsights() {
             document.getElementById('insightsModal').classList.remove('hidden');
-            const entries = getAllEntries().slice(0, 15);
+            const entries = getAllEntries(); // Always analyze all data for the chart, or switch to viewMode logic if preferred
             const content = document.getElementById('insightsContent');
-            if (entries.length === 0) { content.innerHTML = '<div class="text-center p-8">No history found.</div>'; return; }
-            content.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-center space-y-4"><div class="text-4xl animate-bounce">🤖</div><p>Analyzing...</p><div class="w-full max-w-xs h-2 bg-gray-200 rounded-full overflow-hidden"><div class="h-full bg-purple-500 ai-shimmer w-full"></div></div></div>';
+            const chartCanvas = document.getElementById('budgetChart');
+            const legendContainer = document.getElementById('chartLegend');
+            
+            // Clear previous states
+            content.innerHTML = '<div class="flex flex-col items-center justify-center py-4 text-purple-600"><span class="animate-pulse">✨ AI Thinking...</span></div>';
+            legendContainer.innerHTML = '';
+            
+            // Reset canvas
+            const ctx = chartCanvas.getContext('2d');
+            ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+
+            if (entries.length === 0) { 
+                content.innerHTML = '<div class="text-center p-4">No history found.</div>';
+                document.getElementById('chartTotal').textContent = "₹0";
+                return; 
+            }
+            
+            // 1. Process Data
+            const catTotals = {}; 
+            let total = 0;
+            entries.forEach(e => { const amt = parseFloat(e.amount) || 0; catTotals[e.category] = (catTotals[e.category] || 0) + amt; total += amt; });
+            
+            // Update Center Total
+            document.getElementById('chartTotal').textContent = `₹${total.toFixed(0)}`;
+
+            // Sort & Prep for Chart
+            const sortedCats = Object.entries(catTotals).sort((a,b) => b[1] - a[1]);
+            const chartData = sortedCats.map(([label, value], i) => ({
+                label, value, color: CHART_COLORS[i % CHART_COLORS.length]
+            }));
+
+            // 2. Draw Donut Chart
+            drawDonutChart(ctx, chartData, total);
+
+            // 3. Render Legend
+            legendContainer.innerHTML = chartData.map(item => {
+                const pct = ((item.value / total) * 100).toFixed(1);
+                return `
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full" style="background-color: ${item.color}"></div>
+                        <span class="text-sm font-medium text-dark dark:text-white">${item.label}</span>
+                    </div>
+                    <div class="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                        ₹${item.value} <span class="text-xs font-normal opacity-70">(${pct}%)</span>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // 4. AI Insight (Async)
             try {
-                const prompt = `Analyze last ${entries.length} expenses: ${JSON.stringify(entries)}. Summarize: Total spent, Highest category, and a friendly tip. Use markdown, emojis. < 100 words.`;
+                const recent = entries.slice(0, 15);
+                const prompt = `Analyze last ${recent.length} expenses: ${JSON.stringify(recent)}. Summarize: Highest category and a friendly tip. Use markdown, emojis. < 60 words.`;
                 const result = await callGemini(prompt);
                 content.innerHTML = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-            } catch (err) { content.innerHTML = '<div class="text-center text-red-500">Failed. Check API Key in Settings.</div>'; }
+            } catch (err) { content.innerHTML = '<div class="text-center text-red-500 text-xs">AI Failed (Check Key)</div>'; }
         }
-        function closeInsights() { document.getElementById('insightsModal').classList.add('hidden'); }
-        function toggleVoiceMode() {
-            if (manualMode) cancelManualMode();
-            if (voiceMode) { if (isListening && recognition) recognition.abort(); cancelVoiceMode(); }
-            else {
-                voiceMode = true; document.getElementById("voiceInput").classList.remove("hidden");
-                document.getElementById("voiceText").value = "";
-                if (recognition) try { recognition.start(); } catch (err) { console.error(err); cancelVoiceMode(); }
+
+        function drawDonutChart(ctx, data, total) {
+            const centerX = 128;
+            const centerY = 128;
+            const radius = 100;
+            const innerRadius = 75; // Creates the hole
+            
+            let startAngle = -0.5 * Math.PI; // Start at top
+
+            // Animation Loop
+            let progress = 0;
+            function animate() {
+                progress += 0.05;
+                if (progress > 1) progress = 1;
+
+                ctx.clearRect(0, 0, 256, 256);
+                let currentAngle = startAngle;
+
+                data.forEach(slice => {
+                    const sliceAngle = (slice.value / total) * 2 * Math.PI;
+                    const drawAngle = sliceAngle * progress;
+
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + drawAngle);
+                    ctx.arc(centerX, centerY, innerRadius, currentAngle + drawAngle, currentAngle, true); // Reverse for hole
+                    ctx.closePath();
+                    ctx.fillStyle = slice.color;
+                    ctx.fill();
+
+                    // White border for separation
+                    ctx.strokeStyle = document.documentElement.classList.contains('dark') ? '#252525' : '#ffffff';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+
+                    currentAngle += sliceAngle;
+                });
+
+                if (progress < 1) requestAnimationFrame(animate);
             }
+            animate();
         }
+
+        function closeInsights() { document.getElementById('insightsModal').classList.add('hidden'); }
+        function toggleVoiceMode() { if (manualMode) cancelManualMode(); if (voiceMode) { if (isListening && recognition) recognition.abort(); cancelVoiceMode(); } else { voiceMode = true; document.getElementById("voiceInput").classList.remove("hidden"); document.getElementById("voiceText").value = ""; if (recognition) try { recognition.start(); } catch (err) { console.error(err); cancelVoiceMode(); } } }
         function cancelVoiceMode() { voiceMode = false; if (isListening) recognition.abort(); document.getElementById('voiceInput').classList.add('hidden'); }
-        function toggleManualMode() {
-            if (voiceMode) cancelVoiceMode();
-            if (manualMode) cancelManualMode();
-            else { manualMode = true; document.getElementById('manualInput').classList.remove("hidden"); document.getElementById('manualText').focus(); }
-        }
+        function toggleManualMode() { if (voiceMode) cancelVoiceMode(); if (manualMode) cancelManualMode(); else { manualMode = true; document.getElementById('manualInput').classList.remove("hidden"); document.getElementById('manualText').focus(); } }
         function saveManualEntry() {
             const text = document.getElementById("manualText").value.trim();
             const amount = document.getElementById("manualAmount").value.trim();
@@ -552,33 +637,16 @@
             else { updateEntry(editingEntryId, displayText, amount, category); showStatus("Updated!", "success"); }
             cancelManualMode(); renderTransactions();
         }
-        function cancelManualMode() {
-            manualMode = false; editingEntryId = null;
-            document.getElementById("manualInput").classList.add("hidden");
-            document.getElementById("manualText").value = ""; document.getElementById("manualAmount").value = "";
-            if(categories.length > 0) document.getElementById("manualCategory").value = categories[0].name;
-            document.getElementById("saveManualBtn").textContent = "Save Entry";
-        }
-        function initTheme() {
-            const html = document.documentElement;
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { html.classList.add('dark'); document.getElementById('moonIcon').classList.add('hidden'); document.getElementById('sunIcon').classList.remove('hidden'); }
-            else { html.classList.remove('dark'); document.getElementById('moonIcon').classList.remove('hidden'); document.getElementById('sunIcon').classList.add('hidden'); }
-        }
-        function toggleTheme() {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.theme = 'light'; document.getElementById('moonIcon').classList.remove('hidden'); document.getElementById('sunIcon').classList.add('hidden'); }
-            else { html.classList.add('dark'); localStorage.theme = 'dark'; document.getElementById('moonIcon').classList.add('hidden'); document.getElementById('sunIcon').classList.remove('hidden'); }
-        }
+        function cancelManualMode() { manualMode = false; editingEntryId = null; document.getElementById("manualInput").classList.add("hidden"); document.getElementById("manualText").value = ""; document.getElementById("manualAmount").value = ""; if(categories.length > 0) document.getElementById("manualCategory").value = categories[0].name; document.getElementById("saveManualBtn").textContent = "Save Entry"; }
+        function initTheme() { const html = document.documentElement; if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { html.classList.add('dark'); document.getElementById('moonIcon').classList.add('hidden'); document.getElementById('sunIcon').classList.remove('hidden'); } else { html.classList.remove('dark'); document.getElementById('moonIcon').classList.remove('hidden'); document.getElementById('sunIcon').classList.add('hidden'); } }
+        function toggleTheme() { const html = document.documentElement; if (html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.theme = 'light'; document.getElementById('moonIcon').classList.remove('hidden'); document.getElementById('sunIcon').classList.add('hidden'); } else { html.classList.add('dark'); localStorage.theme = 'dark'; document.getElementById('moonIcon').classList.add('hidden'); document.getElementById('sunIcon').classList.remove('hidden'); } }
         
-        // STORAGE UTILS
         function getStorageStructure() { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
-        function saveToStorage(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+        function saveToStorage(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); updateDashboardCard(); }
         function addEntry(text, type, amount, category) {
-            const now = new Date();
-            const y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0'), d = String(now.getDate()).padStart(2, '0');
+            const now = new Date(); const y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0'), d = String(now.getDate()).padStart(2, '0');
             const entry = { id: Date.now(), text, description: text.split(' - ₹')[0], amount, category, type, time: now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'}), date: `${y}-${m}-${d}`, timestamp: now.getTime() };
-            const s = getStorageStructure();
-            if(!s[y]) s[y] = {}; if(!s[y][m]) s[y][m] = {}; if(!s[y][m][d]) s[y][m][d] = [];
+            const s = getStorageStructure(); if(!s[y]) s[y] = {}; if(!s[y][m]) s[y][m] = {}; if(!s[y][m][d]) s[y][m][d] = [];
             s[y][m][d].push(entry); saveToStorage(s);
         }
         function updateEntry(id, text, amount, category) {
@@ -588,22 +656,24 @@
                 if(idx !== -1) { list[idx].text = text; list[idx].amount = amount; list[idx].category = category; list[idx].description = text.split(' - ₹')[0]; saveToStorage(s); return; }
             }
         }
-        function getAllEntries() {
-            const s = getStorageStructure(); const all = [];
-            for(let y in s) for(let m in s[y]) for(let d in s[y][m]) all.push(...s[y][m][d]);
-            return all.sort((a,b) => b.timestamp - a.timestamp);
+        function getAllEntries() { const s = getStorageStructure(); const all = []; for(let y in s) for(let m in s[y]) for(let d in s[y][m]) all.push(...s[y][m][d]); return all.sort((a,b) => b.timestamp - a.timestamp); }
+        function getTodayEntries() { const now = new Date(), y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0'); return (getStorageStructure()[y]?.[m]?.[d] || []).slice().reverse(); }
+        function getMonthlyTotal() {
+            const now = new Date(), y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'); const s = getStorageStructure(); const monthData = s[y]?.[m] || {}; let total = 0;
+            for(let d in monthData) { monthData[d].forEach(e => total += (parseFloat(e.amount) || 0)); } return total;
         }
-        function getTodayEntries() {
-            const now = new Date(), y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
-            return (getStorageStructure()[y]?.[m]?.[d] || []).slice().reverse();
+        function updateDashboardCard() {
+            const total = getMonthlyTotal(); document.getElementById('totalSpentDisplay').textContent = total.toFixed(2);
+            const progressBar = document.getElementById('budgetProgressBar'); const limitDisplay = document.getElementById('budgetLimitDisplay');
+            if (monthlyLimit > 0) {
+                const pct = Math.min((total / monthlyLimit) * 100, 100); progressBar.style.width = `${pct}%`; limitDisplay.textContent = `Limit: ₹${monthlyLimit}`;
+                if (pct < 50) progressBar.className = "bg-green-500 h-2 rounded-full progress-bar"; else if (pct < 80) progressBar.className = "bg-yellow-500 h-2 rounded-full progress-bar"; else progressBar.className = "bg-red-500 h-2 rounded-full progress-bar";
+            } else { progressBar.style.width = '0%'; limitDisplay.textContent = "Limit: ∞"; }
         }
         function deleteEntryById(id, date) {
-            const s = getStorageStructure(); const [y,m,d] = date.split('-');
-            const list = s[y]?.[m]?.[d]; if(!list) return;
-            const idx = list.findIndex(e => e.id === id); if(idx === -1) return;
-            list.splice(idx, 1);
-            if(list.length===0) { delete s[y][m][d]; if(Object.keys(s[y][m]).length===0) delete s[y][m]; if(Object.keys(s[y]).length===0) delete s[y]; }
-            saveToStorage(s);
+            const s = getStorageStructure(); const [y,m,d] = date.split('-'); const list = s[y]?.[m]?.[d]; if(!list) return;
+            const idx = list.findIndex(e => e.id === id); if(idx === -1) return; list.splice(idx, 1);
+            if(list.length===0) { delete s[y][m][d]; if(Object.keys(s[y][m]).length===0) delete s[y][m]; if(Object.keys(s[y]).length===0) delete s[y]; } saveToStorage(s);
         }
         function confirmDeleteEntry(id, date) { if(confirm("Delete?")) { deleteEntryById(id, date); showStatus("Deleted", "success"); renderTransactions(); } }
         function startEditEntry(id, date) {
@@ -617,10 +687,10 @@
         function switchViewMode(mode) {
             viewMode = mode; currentPage = 0;
             const t = document.getElementById('todayBtn'), a = document.getElementById('allBtn');
-            const active = "flex-1 py-2 text-xs font-semibold rounded-lg shadow-sm bg-white dark:bg-darkSurface text-dark dark:text-white transition-all";
-            const inactive = "flex-1 py-2 text-xs font-medium text-gray-500 dark:text-gray-500 hover:text-dark dark:hover:text-gray-300 transition-all";
-            t.className = mode === 'today' ? active : inactive; a.className = mode === 'all' ? active : inactive;
-            document.getElementById('entriesTitle').textContent = mode === 'today' ? "Today" : 'History'; renderTransactions();
+            t.className = mode === 'today' ? "flex-1 py-2 text-xs font-semibold rounded-lg shadow-sm bg-white dark:bg-darkSurface text-dark dark:text-white transition-all" : "flex-1 py-2 text-xs font-medium text-gray-500 dark:text-gray-500 hover:text-dark dark:hover:text-gray-300 transition-all";
+            a.className = mode === 'all' ? "flex-1 py-2 text-xs font-semibold rounded-lg shadow-sm bg-white dark:bg-darkSurface text-dark dark:text-white transition-all" : "flex-1 py-2 text-xs font-medium text-gray-500 dark:text-gray-500 hover:text-dark dark:hover:text-gray-300 transition-all";
+            document.getElementById('entriesTitle').textContent = mode === 'today' ? "Today's Entries" : 'All Transactions';
+            renderTransactions();
         }
         function renderTransactions() {
             const entries = viewMode === 'today' ? getTodayEntries() : getAllEntries();
@@ -632,30 +702,10 @@
                 const icon = cat ? (cat.type === 'svg' ? `<div class="w-10 h-10 rounded-full overflow-hidden">${cat.icon}</div>` : `<div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-lg shadow-inner">${cat.icon}</div>`) : `<div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-lg shadow-inner">🛒</div>`;
                 const amount = e.amount ? `<span class="font-bold text-dark dark:text-white">-₹${e.amount}</span>` : '';
                 
-                // --- NEW DATE LOGIC ---
-                // Convert timestamp to Date object
-                const dateObj = new Date(e.timestamp);
-                // Format: DD/MM (e.g. 30/11)
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-                const formattedDate = `${day}/${month}`;
+                let formattedDate = e.date || "Error"; let formattedTime = e.time || "";
+                if (e.timestamp) { const d = new Date(e.timestamp); if (!isNaN(d.getTime())) { formattedDate = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`; formattedTime = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; } }
                 
-                // Format: HH:MM (e.g. 14:30)
-                const hours = String(dateObj.getHours()).padStart(2, '0');
-                const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-                const formattedTime = `${hours}:${minutes}`;
-                
-                return `
-                <div class="flex items-center justify-between p-4 bg-white dark:bg-darkSurface rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow transition-colors">
-                    <div class="flex items-center gap-4">
-                        ${icon}
-                        <div>
-                            <h4 class="font-semibold text-sm text-dark dark:text-white line-clamp-1">${escapeHtml(e.description || e.text)} ${amount}</h4>
-                            <p class="text-[10px] text-gray-400 font-medium">${formattedDate} • ${formattedTime} • ${e.type === "voice" ? "🎙️" : "✏️"}</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-2"><button onclick="startEditEntry(${e.id}, '${e.date}')" class="text-gray-400 hover:text-blue-500 text-xs">Edit</button><button onclick="confirmDeleteEntry(${e.id}, '${e.date}')" class="text-gray-400 hover:text-red-500 text-xs">Del</button></div>
-                </div>`;
+                return `<div class="flex items-center justify-between p-4 bg-white dark:bg-darkSurface rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow transition-colors"><div class="flex items-center gap-4">${icon}<div><h4 class="font-semibold text-sm text-dark dark:text-white line-clamp-1">${escapeHtml(e.description || e.text || "No Description")} ${amount}</h4><p class="text-[10px] text-gray-400 font-medium">${formattedDate} • ${formattedTime} • ${e.type === "voice" ? "🎙️" : "✏️"}</p></div></div><div class="flex gap-2"><button onclick="startEditEntry(${e.id}, '${e.date}')" class="text-gray-400 hover:text-blue-500 text-xs">Edit</button><button onclick="confirmDeleteEntry(${e.id}, '${e.date}')" class="text-gray-400 hover:text-red-500 text-xs">Del</button></div></div>`;
             }).join("") : `<div class="text-center py-10 opacity-50 dark:opacity-40"><div class="text-4xl mb-2">📝</div><p class="text-sm dark:text-gray-400">No entries yet.</p></div>`;
             
             if(total > 1) {
