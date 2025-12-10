@@ -15,31 +15,17 @@
                 extend: {
                     fontFamily: { sans: ['Nunito', 'sans-serif'] },
                     colors: {
-                        sky: {
-                            300: '#7DD3FC',
-                            400: '#38BDF8',
-                        },
-                        sun: '#FDB813',
-                        grass: '#4ADE80',
-                        cartoonBlue: '#60A5FA',
-                        cartoonPurple: '#A78BFA',
                         night: '#0F172A',
                         nightSurface: '#1E293B'
                     },
                     boxShadow: {
                         '3d': '0 4px 0 0 rgba(0,0,0,0.1)',
-                        '3d-hover': '0 6px 0 0 rgba(0,0,0,0.1)',
                         '3d-active': '0 0 0 0 rgba(0,0,0,0)',
-                        'btn-primary': '0 4px 0 0 #2563EB', // Darker blue for 3d effect
-                        'btn-danger': '0 4px 0 0 #DC2626', // Darker red
-                        'btn-success': '0 4px 0 0 #059669', // Darker green
-                        'card-float': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-                        'inner-light': 'inset 0 2px 4px 0 rgba(255, 255, 255, 0.3)',
+                        'btn-primary': '0 4px 0 0 #2563EB',
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'float-delayed': 'float 6s ease-in-out 3s infinite',
-                        'bounce-slow': 'bounce 3s infinite',
                     },
                     keyframes: {
                         float: {
@@ -52,188 +38,155 @@
         }
     </script>
     <style>
-        /* CRITICAL FIX: Use 100dvh for mobile browsers */
+        /* CRITICAL: Fix body to viewport, preventing rubber-banding */
         body { 
             -webkit-tap-highlight-color: transparent;
             font-family: 'Nunito', sans-serif;
-            height: 100dvh; /* Dynamic Viewport Height */
-            overflow: hidden; /* Prevent body scroll */
-            position: fixed; /* Lock body in place */
+            height: 100dvh;
             width: 100%;
-        }
-
-        /* --- CARTOON BACKGROUNDS --- */
-        .bg-day {
-            background: linear-gradient(180deg, #38BDF8 0%, #BAE6FD 100%);
-        }
-        .dark .bg-day {
-            background: linear-gradient(180deg, #0F172A 0%, #312E81 100%);
+            overflow: hidden;
         }
 
         /* Clouds Animation */
         .cloud {
             position: absolute;
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.6);
             border-radius: 50px;
             z-index: 0;
             pointer-events: none;
         }
         .dark .cloud {
-            background: rgba(255, 255, 255, 0.05);
+            opacity: 0.1;
+            background: rgba(255, 255, 255, 0.1);
         }
         
-        /* 3D Button Utility Class */
-        .btn-3d {
-            transition: all 0.1s;
-            transform: translateY(0);
-        }
-        .btn-3d:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 0 !important;
-        }
+        .btn-3d { transition: all 0.1s; transform: translateY(0); }
+        .btn-3d:active { transform: translateY(4px); box-shadow: 0 0 0 0 !important; }
 
-        /* Scrollbar */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Custom Shapes */
-        .cloud-shape {
-            border-radius: 30px;
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-        }
-
-        /* Mic Button Animation */
-        .mic-pulse {
-            animation: mic-pulse 2s infinite;
-        }
+        .mic-pulse { animation: mic-pulse 2s infinite; }
         @keyframes mic-pulse {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
             70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
-        /* Stars for Dark Mode */
+        /* Stars */
         .star {
             position: absolute;
             background: white;
             border-radius: 50%;
             opacity: 0;
-            animation: twinkle 5s infinite;
+            animation: twinkle 4s infinite ease-in-out;
+            box-shadow: 0 0 10px white;
         }
         @keyframes twinkle {
-            0%, 100% { opacity: 0; transform: scale(0.5); }
-            50% { opacity: 0.8; transform: scale(1); }
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
+        
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="flex justify-center bg-day selection:bg-yellow-200 selection:text-yellow-900">
+<!-- UPDATED: Background classes applied directly via Tailwind for reliability -->
+<body class="flex justify-center bg-gradient-to-b from-sky-400 to-blue-200 dark:from-slate-900 dark:to-slate-800 transition-colors duration-500 selection:bg-yellow-200 selection:text-yellow-900">
 
-    <!-- Background Elements (Clouds/Stars) -->
+    <!-- Background Elements -->
     <div class="absolute top-10 left-[-20px] w-32 h-12 cloud animate-float blur-sm"></div>
     <div class="absolute top-40 right-[-30px] w-40 h-14 cloud animate-float-delayed blur-sm"></div>
     <div class="absolute bottom-20 left-10 w-24 h-8 cloud animate-float opacity-50"></div>
     
-    <!-- Stars (Visible in dark mode via CSS opacity toggle logic usually, but simplified here) -->
-    <div class="hidden dark:block">
+    <!-- Stars (Dark Mode) -->
+    <div class="hidden dark:block pointer-events-none fixed inset-0 z-0">
         <div class="star top-10 left-10 w-1 h-1" style="animation-delay: 0s"></div>
         <div class="star top-20 right-20 w-2 h-2" style="animation-delay: 1s"></div>
-        <div class="star bottom-40 left-1/3 w-1 h-1" style="animation-delay: 2s"></div>
+        <div class="star bottom-40 left-1/3 w-1.5 h-1.5" style="animation-delay: 2s"></div>
         <div class="star top-1/2 right-10 w-2 h-2" style="animation-delay: 0.5s"></div>
+        <div class="star top-5 left-1/2 w-1 h-1" style="animation-delay: 1.5s"></div>
     </div>
 
-    <!-- Mobile Container -->
-    <!-- CRITICAL FIX: h-full here now respects the 100dvh body -->
-    <div class="w-full max-w-md h-full sm:h-[95vh] sm:my-auto sm:rounded-[40px] shadow-2xl relative flex flex-col transition-colors duration-300 z-10 bg-white/30 dark:bg-black/30 backdrop-blur-md sm:border-8 border-white/40 dark:border-white/10 overflow-hidden">
+    <!-- MAIN PHONE CONTAINER -->
+    <!-- This is the "Frame". It has NO scroll. It holds the nav bars relative to itself. -->
+    <div class="w-full max-w-md h-full sm:h-[95vh] sm:my-auto sm:rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative flex flex-col transition-colors duration-300 z-10 bg-white/40 dark:bg-black/40 backdrop-blur-xl sm:border-8 border-white/40 dark:border-white/10 overflow-hidden ring-1 ring-white/20">
         
-        <!-- Header Section -->
-        <div class="px-6 pt-10 pb-4 z-10 shrink-0">
-            <!-- Top Bar -->
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex flex-col">
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-blue-900 dark:text-blue-200 opacity-80">Today is</h2>
-                    <div id="dateDisplay" class="text-white dark:text-white font-black text-2xl drop-shadow-sm">Loading...</div>
-                </div>
-                
-                <div class="flex gap-3">
-                    <button id="themeToggle" class="btn-3d w-12 h-12 bg-white dark:bg-nightSurface rounded-2xl flex items-center justify-center text-2xl shadow-3d active:shadow-none border-b-4 border-gray-200 dark:border-black transition-transform">
-                        <span id="sunIcon" class="hidden">☀️</span>
-                        <span id="moonIcon" class="">🌙</span>
-                    </button>
-                    <button id="manualBtn" class="btn-3d w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center text-xl shadow-btn-primary border-b-4 border-yellow-600 text-yellow-900 transition-transform">
-                        ✏️
-                    </button>
-                </div>
-            </div>
-
-            <!-- "Cloud" Dashboard Card -->
-            <div class="relative bg-white dark:bg-nightSurface rounded-[30px] p-6 shadow-xl border-2 border-white/50 dark:border-gray-700 overflow-hidden transition-all duration-300 transform hover:scale-[1.02]">
-                <!-- Cute Sun Decoration -->
-                <div class="absolute -right-6 -top-6 w-20 h-20 bg-yellow-300 rounded-full opacity-20 animate-pulse"></div>
-                
-                <div class="relative z-10 text-center">
-                    <h1 class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Total Spent</h1>
-                    
-                    <!-- Big Total -->
-                    <div class="text-5xl font-black text-blue-600 dark:text-blue-400 mb-4 tracking-tight flex justify-center items-start gap-1 drop-shadow-sm">
-                        <span class="text-2xl mt-1 opacity-60">₹</span>
-                        <span id="totalSpentDisplay">0</span>
-                    </div>
-
-                    <!-- Budget Progress (Fuel Gauge Style) -->
-                    <div class="bg-gray-100 dark:bg-gray-800 p-1 rounded-full mb-3 shadow-inner">
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden relative">
-                            <div id="budgetProgressBar" class="bg-gradient-to-r from-green-400 to-emerald-500 h-4 rounded-full transition-all duration-1000 ease-out shadow-[0_2px_4px_rgba(0,0,0,0.2)]" style="width: 0%">
-                                <!-- Shine effect -->
-                                <div class="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-full"></div>
-                            </div>
+        <!-- SCROLLABLE CONTENT AREA -->
+        <!-- The Header and List live inside here. This part scrolls. -->
+        <!-- Added pb-32 so content doesn't get hidden behind the floating nav -->
+        <div class="flex-1 overflow-y-auto no-scrollbar scroll-smooth pb-32 w-full">
+            
+            <!-- Header Section -->
+            <div class="px-6 pt-10 pb-4">
+                <!-- Top Bar -->
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col items-start">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-blue-900 dark:text-blue-200 opacity-80 mb-1 ml-1">Today is</h2>
+                        <div class="bg-gradient-to-r from-amber-400 to-orange-500 dark:from-indigo-600 dark:to-purple-700 text-white px-5 py-2 rounded-2xl shadow-md border-2 border-white/50 dark:border-white/10 backdrop-blur-sm transform -rotate-1 transition-colors duration-300">
+                            <div id="dateDisplay" class="font-black text-xl drop-shadow-sm">Loading...</div>
                         </div>
                     </div>
                     
-                    <div class="flex justify-between text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-4 px-1">
-                        <span>Spent</span>
-                        <span id="budgetLimitDisplay">Limit: ∞</span>
+                    <div class="flex gap-3">
+                        <button id="themeToggle" class="btn-3d w-12 h-12 bg-white dark:bg-nightSurface text-2xl rounded-2xl flex items-center justify-center shadow-3d active:shadow-none border-b-4 border-gray-200 dark:border-black transition-transform">
+                            <span id="sunIcon" class="hidden">☀️</span>
+                            <span id="moonIcon" class="">🌙</span>
+                        </button>
+                        <button id="manualBtn" class="btn-3d w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center text-xl shadow-btn-primary border-b-4 border-yellow-600 text-yellow-900 transition-transform">
+                            ✏️
+                        </button>
                     </div>
+                </div>
+
+                <!-- Dashboard Card -->
+                <div class="relative bg-white dark:bg-nightSurface rounded-[30px] p-6 shadow-xl border-2 border-white/50 dark:border-gray-700 overflow-hidden transition-all duration-300">
+                    <div class="absolute -right-6 -top-6 w-20 h-20 bg-yellow-300 dark:bg-purple-500 rounded-full opacity-20 animate-pulse"></div>
                     
-                    <!-- Toggle Switch -->
-                    <div class="flex bg-gray-100 dark:bg-black/50 p-1.5 rounded-xl shadow-inner relative">
-                        <button id="todayBtn" class="flex-1 py-2 text-xs font-extrabold rounded-lg text-gray-700 dark:text-gray-200 hover:bg-white/50 transition-all z-10 bg-white dark:bg-gray-700 shadow-sm">Today</button>
-                        <button id="allBtn" class="flex-1 py-2 text-xs font-extrabold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all z-10">All Time</button>
+                    <div class="relative z-10 text-center">
+                        <h1 class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Total Spent</h1>
+                        <div class="text-5xl font-black text-blue-600 dark:text-blue-400 mb-4 tracking-tight flex justify-center items-start gap-1 drop-shadow-sm">
+                            <span class="text-2xl mt-1 opacity-60">₹</span>
+                            <span id="totalSpentDisplay">0</span>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-800 p-1 rounded-full mb-3 shadow-inner">
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden relative">
+                                <div id="budgetProgressBar" class="bg-gradient-to-r from-green-400 to-emerald-500 h-4 rounded-full transition-all duration-1000 ease-out shadow-[0_2px_4px_rgba(0,0,0,0.2)]" style="width: 0%">
+                                    <div class="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-4 px-1">
+                            <span>Spent</span>
+                            <span id="budgetLimitDisplay">Limit: ∞</span>
+                        </div>
+                        <div class="flex bg-gray-100 dark:bg-black/50 p-1.5 rounded-xl shadow-inner relative">
+                            <button id="todayBtn" class="flex-1 py-2 text-xs font-extrabold rounded-lg text-gray-700 dark:text-gray-200 hover:bg-white/50 transition-all z-10 bg-white dark:bg-gray-700 shadow-sm">Today</button>
+                            <button id="allBtn" class="flex-1 py-2 text-xs font-extrabold text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all z-10">All Time</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Status Toast (Bubble) -->
-        <div id="statusMessage" class="hidden absolute top-24 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl text-sm font-bold shadow-xl border-b-4 z-50 transition-all duration-300 animate-bounce"></div>
-
-        <!-- Transactions List (White Sheet) -->
-        <div class="flex-1 bg-white dark:bg-night rounded-t-[40px] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col relative z-20">
-            <!-- Drag Handle -->
-            <div class="w-full flex justify-center pt-3 pb-1 shrink-0">
-                <div class="w-12 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-            </div>
-
-            <div class="flex-1 overflow-y-auto px-6 pb-36 no-scrollbar pt-2">
-                <div class="flex items-center justify-between mb-4 sticky top-0 bg-white/95 dark:bg-night/95 backdrop-blur-sm py-2 z-10">
+            <!-- Transactions List -->
+            <div class="px-6 pt-2">
+                <div class="flex items-center justify-between mb-4 sticky top-0 bg-white/80 dark:bg-night/80 backdrop-blur-md py-3 z-10 rounded-xl px-2">
                     <h3 id="entriesTitle" class="font-extrabold text-xl text-gray-800 dark:text-white flex items-center gap-2">
                         Recent
                         <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-1 rounded-full">Moves</span>
                     </h3>
-                    <span id="transactionCount" class="text-xs font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
-                        0
-                    </span>
+                    <span id="transactionCount" class="text-xs font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">0</span>
                 </div>
 
                 <div id="transactionsGrid" class="space-y-3"></div>
-                
                 <div id="pagination" class="flex justify-center gap-4 mt-8 mb-4"></div>
                 <div id="paginationInfo" class="text-center text-xs font-bold text-gray-300 pb-4"></div>
             </div>
         </div>
+        <!-- END SCROLLABLE CONTENT -->
 
-        <!-- Floating Bottom Navigation -->
-        <!-- Fixed positioning logic updated -->
+        <!-- FIXED FOOTER ELEMENTS (Nav + FAB) -->
+        <!-- These are children of the Main Phone Container, sitting 'absolute' at the bottom -->
+        
         <div class="absolute bottom-6 left-6 right-6 bg-white dark:bg-nightSurface rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center text-gray-400 text-[10px] font-bold z-30 safe-area-bottom">
             <div class="flex flex-col items-center text-blue-500 dark:text-blue-400 cursor-pointer active:scale-90 transition-transform" onclick="window.location.reload()">
                 <div class="text-2xl mb-1">🏠</div>
@@ -243,8 +196,7 @@
                 <div class="text-2xl mb-1">📊</div>
                 Analytics
             </div>
-            <!-- Spacer for FAB -->
-            <div class="w-12"></div> 
+            <div class="w-12"></div> <!-- Spacer for FAB -->
             <div id="categoriesNavBtn" class="flex flex-col items-center hover:text-green-500 cursor-pointer active:scale-90 transition-transform">
                 <div class="text-2xl mb-1">🏷️</div>
                 Tags
@@ -255,14 +207,13 @@
             </div>
         </div>
 
-        <!-- FAB (Floating Action Button) - The "Sun" Button -->
-        <button id="voiceBtn" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-red-400 to-pink-600 shadow-[0_8px_20px_rgba(236,72,153,0.4)] flex items-center justify-center text-white z-40 border-4 border-white dark:border-nightSurface active:scale-90 transition-transform">
+        <button id="voiceBtn" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-red-400 to-pink-600 shadow-[0_8px_20px_rgba(236,72,153,0.4)] flex items-center justify-center text-white z-40 border-4 border-white dark:border-nightSurface active:scale-90 transition-transform safe-area-bottom">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 drop-shadow-md" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
         </button>
 
-        <!-- Modals with "Clay" look -->
-        
-        <!-- VOICE MODAL -->
+        <!-- Modals and Status -->
+        <div id="statusMessage" class="hidden absolute top-24 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl text-sm font-bold shadow-xl border-b-4 z-50 transition-all duration-300 animate-bounce"></div>
+
         <div id="voiceInput" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="document.getElementById('cancelVoiceBtn').click()"></div>
             <div class="w-full bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl animate-bounce-slow relative z-10 pb-8">
@@ -286,7 +237,6 @@
             </div>
         </div>
 
-        <!-- MANUAL INPUT MODAL -->
         <div id="manualInput" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="document.getElementById('cancelManualBtn').click()"></div>
             <div class="w-full bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl relative z-10 pb-8">
@@ -319,7 +269,6 @@
             </div>
         </div>
 
-        <!-- CATEGORIES MODAL -->
         <div id="categoriesModal" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeCategoryManager()"></div>
             <div class="w-full h-[85vh] bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl flex flex-col relative z-10 pb-8">
@@ -333,7 +282,6 @@
             </div>
         </div>
 
-        <!-- ADD CATEGORY MODAL -->
         <div id="addCategoryModal" class="hidden absolute inset-0 z-[60] bg-white dark:bg-nightSurface p-6 flex flex-col h-full">
             <div class="flex items-center gap-4 mb-8 pt-4">
                 <button onclick="closeAddCategoryModal()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-xl dark:text-white">←</button>
@@ -355,7 +303,6 @@
             <button onclick="saveCategory()" class="btn-3d w-full py-4 rounded-2xl bg-green-500 text-white font-bold border-b-4 border-green-700 mb-6">Save It</button>
         </div>
 
-        <!-- INSIGHTS MODAL (Analytics) -->
         <div id="insightsModal" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeInsights()"></div>
             <div class="w-full h-[90vh] bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl flex flex-col relative z-10 pb-8">
@@ -366,20 +313,15 @@
                 </div>
                 
                 <div class="flex-1 overflow-y-auto pr-1 no-scrollbar pb-4">
-                    <!-- AI Text Bubble -->
                     <div id="insightsContent" class="mb-8 bg-blue-50 dark:bg-blue-900/20 rounded-3xl p-5 text-sm font-semibold leading-relaxed text-gray-700 dark:text-gray-300 border-2 border-blue-100 dark:border-blue-900/30 relative"></div>
-
-                    <!-- Chart -->
                     <div id="spendingVisuals" class="mb-6 flex flex-col items-center">
                         <div class="relative w-64 h-64 mb-6">
                             <canvas id="budgetChart" width="256" height="256"></canvas>
-                            <!-- Center Text -->
                             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                 <span class="text-xs font-bold text-gray-400 uppercase">Total</span>
                                 <span id="chartTotal" class="text-3xl font-black text-dark dark:text-white">₹0</span>
                             </div>
                         </div>
-                        <!-- Legend -->
                         <div id="chartLegend" class="w-full space-y-3"></div>
                     </div>
                 </div>
@@ -387,7 +329,6 @@
             </div>
         </div>
 
-        <!-- SETTINGS MODAL -->
         <div id="settingsModal" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeSettings()"></div>
             <div class="w-full h-[80vh] bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl flex flex-col relative z-10 pb-8">
