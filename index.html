@@ -38,7 +38,6 @@
         }
     </script>
     <style>
-        /* CRITICAL: Fix body to viewport, preventing rubber-banding */
         body { 
             -webkit-tap-highlight-color: transparent;
             font-family: 'Nunito', sans-serif;
@@ -46,8 +45,6 @@
             width: 100%;
             overflow: hidden;
         }
-
-        /* Clouds Animation */
         .cloud {
             position: absolute;
             background: rgba(255, 255, 255, 0.6);
@@ -55,25 +52,17 @@
             z-index: 0;
             pointer-events: none;
         }
-        .dark .cloud {
-            opacity: 0.1;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
+        .dark .cloud { opacity: 0.1; background: rgba(255, 255, 255, 0.1); }
         .btn-3d { transition: all 0.1s; transform: translateY(0); }
         .btn-3d:active { transform: translateY(4px); box-shadow: 0 0 0 0 !important; }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
         .mic-pulse { animation: mic-pulse 2s infinite; }
         @keyframes mic-pulse {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
             70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-
-        /* Stars */
         .star {
             position: absolute;
             background: white;
@@ -86,19 +75,15 @@
             0%, 100% { opacity: 0.3; transform: scale(0.8); }
             50% { opacity: 1; transform: scale(1.2); }
         }
-        
         .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<!-- UPDATED: Background classes applied directly via Tailwind for reliability -->
 <body class="flex justify-center bg-gradient-to-b from-sky-400 to-blue-200 dark:from-slate-900 dark:to-slate-800 transition-colors duration-500 selection:bg-yellow-200 selection:text-yellow-900">
 
-    <!-- Background Elements -->
     <div class="absolute top-10 left-[-20px] w-32 h-12 cloud animate-float blur-sm"></div>
     <div class="absolute top-40 right-[-30px] w-40 h-14 cloud animate-float-delayed blur-sm"></div>
     <div class="absolute bottom-20 left-10 w-24 h-8 cloud animate-float opacity-50"></div>
     
-    <!-- Stars (Dark Mode) -->
     <div class="hidden dark:block pointer-events-none fixed inset-0 z-0">
         <div class="star top-10 left-10 w-1 h-1" style="animation-delay: 0s"></div>
         <div class="star top-20 right-20 w-2 h-2" style="animation-delay: 1s"></div>
@@ -108,22 +93,17 @@
     </div>
 
     <!-- MAIN PHONE CONTAINER -->
-    <!-- This is the "Frame". It has NO scroll. It holds the nav bars relative to itself. -->
     <div class="w-full max-w-md h-full sm:h-[95vh] sm:my-auto sm:rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative flex flex-col transition-colors duration-300 z-10 bg-white/40 dark:bg-black/40 backdrop-blur-xl sm:border-8 border-white/40 dark:border-white/10 overflow-hidden ring-1 ring-white/20">
         
         <!-- SCROLLABLE CONTENT AREA -->
-        <!-- The Header and List live inside here. This part scrolls. -->
-        <!-- Added pb-32 so content doesn't get hidden behind the floating nav -->
         <div class="flex-1 overflow-y-auto no-scrollbar scroll-smooth pb-32 w-full">
             
-            <!-- Header Section -->
             <div class="px-6 pt-10 pb-4">
-                <!-- Top Bar -->
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex flex-col items-start">
                         <h2 class="text-xs font-bold uppercase tracking-wider text-blue-900 dark:text-blue-200 opacity-80 mb-1 ml-1">Today is</h2>
-                        <div class="bg-gradient-to-r from-amber-400 to-orange-500 dark:from-indigo-600 dark:to-purple-700 text-white px-5 py-2 rounded-2xl shadow-md border-2 border-white/50 dark:border-white/10 backdrop-blur-sm transform -rotate-1 transition-colors duration-300">
-                            <div id="dateDisplay" class="font-black text-xl drop-shadow-sm">Loading...</div>
+                        <div class="px-1 transform -rotate-1 transition-colors duration-300">
+                            <div id="dateDisplay" class="font-black text-3xl text-blue-950 dark:text-white drop-shadow-sm">Loading...</div>
                         </div>
                     </div>
                     
@@ -138,7 +118,6 @@
                     </div>
                 </div>
 
-                <!-- Dashboard Card -->
                 <div class="relative bg-white dark:bg-nightSurface rounded-[30px] p-6 shadow-xl border-2 border-white/50 dark:border-gray-700 overflow-hidden transition-all duration-300">
                     <div class="absolute -right-6 -top-6 w-20 h-20 bg-yellow-300 dark:bg-purple-500 rounded-full opacity-20 animate-pulse"></div>
                     
@@ -167,7 +146,6 @@
                 </div>
             </div>
 
-            <!-- Transactions List -->
             <div class="px-6 pt-2">
                 <div class="flex items-center justify-between mb-4 sticky top-0 bg-white/80 dark:bg-night/80 backdrop-blur-md py-3 z-10 rounded-xl px-2">
                     <h3 id="entriesTitle" class="font-extrabold text-xl text-gray-800 dark:text-white flex items-center gap-2">
@@ -182,21 +160,20 @@
                 <div id="paginationInfo" class="text-center text-xs font-bold text-gray-300 pb-4"></div>
             </div>
         </div>
-        <!-- END SCROLLABLE CONTENT -->
 
-        <!-- FIXED FOOTER ELEMENTS (Nav + FAB) -->
-        <!-- These are children of the Main Phone Container, sitting 'absolute' at the bottom -->
-        
+        <!-- FIXED FOOTER ELEMENTS -->
         <div class="absolute bottom-6 left-6 right-6 bg-white dark:bg-nightSurface rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center text-gray-400 text-[10px] font-bold z-30 safe-area-bottom">
             <div class="flex flex-col items-center text-blue-500 dark:text-blue-400 cursor-pointer active:scale-90 transition-transform" onclick="window.location.reload()">
                 <div class="text-2xl mb-1">🏠</div>
                 Home
             </div>
-            <div id="analyticsBtn" class="flex flex-col items-center hover:text-purple-500 cursor-pointer active:scale-90 transition-transform">
+            <!-- Analytics Button -->
+            <div id="analyticsBtn" onclick="openInsights()" class="flex flex-col items-center hover:text-purple-500 cursor-pointer active:scale-90 transition-transform">
                 <div class="text-2xl mb-1">📊</div>
                 Analytics
             </div>
-            <div class="w-12"></div> <!-- Spacer for FAB -->
+            <div class="w-12"></div>
+            <!-- Tags Button (contains Inventory) -->
             <div id="categoriesNavBtn" class="flex flex-col items-center hover:text-green-500 cursor-pointer active:scale-90 transition-transform">
                 <div class="text-2xl mb-1">🏷️</div>
                 Tags
@@ -214,6 +191,19 @@
         <!-- Modals and Status -->
         <div id="statusMessage" class="hidden absolute top-24 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl text-sm font-bold shadow-xl border-b-4 z-50 transition-all duration-300 animate-bounce"></div>
 
+        <!-- NEW: CUSTOM CONFIRMATION MODAL -->
+        <div id="confirmModal" class="hidden absolute inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div class="bg-white dark:bg-nightSurface rounded-3xl p-6 w-3/4 max-w-sm shadow-2xl border-2 border-white/20 transform scale-100 animate-bounce-slow">
+                <h3 class="text-lg font-black text-dark dark:text-white mb-2">Are you sure?</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6" id="confirmMsg">This action cannot be undone.</p>
+                <div class="flex gap-3">
+                    <button id="confirmNoBtn" class="flex-1 btn-3d py-3 rounded-xl bg-gray-200 dark:bg-gray-700 font-bold text-gray-600 dark:text-gray-300 border-b-4 border-gray-300 dark:border-gray-900">No</button>
+                    <button id="confirmYesBtn" class="flex-1 btn-3d py-3 rounded-xl bg-blue-500 text-white font-bold border-b-4 border-blue-700">Yes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VOICE MODAL -->
         <div id="voiceInput" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="document.getElementById('cancelVoiceBtn').click()"></div>
             <div class="w-full bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl animate-bounce-slow relative z-10 pb-8">
@@ -237,6 +227,7 @@
             </div>
         </div>
 
+        <!-- MANUAL INPUT MODAL -->
         <div id="manualInput" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="document.getElementById('cancelManualBtn').click()"></div>
             <div class="w-full bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl relative z-10 pb-8">
@@ -269,16 +260,39 @@
             </div>
         </div>
 
+        <!-- CATEGORIES MODAL (Now includes Inventory) -->
         <div id="categoriesModal" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeCategoryManager()"></div>
             <div class="w-full h-[85vh] bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl flex flex-col relative z-10 pb-8">
-                <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-6"></div>
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-black text-2xl dark:text-white">Tags & Icons</h3>
-                    <button onclick="openAddCategoryModal()" class="btn-3d bg-blue-500 text-white text-xs px-4 py-2 rounded-xl font-bold border-b-4 border-blue-700 active:translate-y-1 active:shadow-none transition-all">＋ New</button>
+                <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
+                
+                <!-- Tab Switcher -->
+                <div class="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-xl mb-4">
+                    <button id="tabTags" onclick="switchModalTab('tags')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-nightSurface shadow-sm text-dark dark:text-white transition-all">🏷️ Tags</button>
+                    <!-- RENAMED TO INVENTORY -->
+                    <button id="tabStash" onclick="switchModalTab('stash')" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all">📦 Inventory</button>
                 </div>
-                <div id="categoryListContainer" class="flex-1 overflow-y-auto space-y-3 pr-1 pb-4"></div>
-                <button onclick="closeCategoryManager()" class="btn-3d mt-4 w-full py-4 rounded-2xl bg-gray-200 dark:bg-gray-700 font-bold text-gray-600 dark:text-gray-300 border-b-4 border-gray-300 dark:border-gray-900">Done</button>
+
+                <!-- VIEW 1: TAGS LIST -->
+                <div id="viewTags" class="flex flex-col flex-1 overflow-hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-black text-xl dark:text-white">Your Categories</h3>
+                        <button onclick="openAddCategoryModal()" class="btn-3d bg-blue-500 text-white text-xs px-4 py-2 rounded-xl font-bold border-b-4 border-blue-700 active:translate-y-1 active:shadow-none transition-all">＋ New</button>
+                    </div>
+                    <div id="categoryListContainer" class="flex-1 overflow-y-auto space-y-3 pr-1 pb-4"></div>
+                </div>
+
+                <!-- VIEW 2: INVENTORY -->
+                <div id="viewStash" class="hidden flex-col flex-1 overflow-hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <!-- RENAMED TO INVENTORY -->
+                        <h3 class="font-black text-xl dark:text-white">Inventory</h3>
+                        <button onclick="openAddInventoryModal()" class="btn-3d bg-orange-500 text-white text-xs px-4 py-2 rounded-xl font-bold border-b-4 border-orange-700 active:translate-y-1 active:shadow-none transition-all">＋ Add Item</button>
+                    </div>
+                    <div id="inventoryListContainer" class="flex-1 overflow-y-auto space-y-3 pr-1 pb-4"></div>
+                </div>
+
+                <button onclick="closeCategoryManager()" class="btn-3d mt-2 w-full py-4 rounded-2xl bg-gray-200 dark:bg-gray-700 font-bold text-gray-600 dark:text-gray-300 border-b-4 border-gray-300 dark:border-gray-900">Done</button>
             </div>
         </div>
 
@@ -303,6 +317,44 @@
             <button onclick="saveCategory()" class="btn-3d w-full py-4 rounded-2xl bg-green-500 text-white font-bold border-b-4 border-green-700 mb-6">Save It</button>
         </div>
 
+        <div id="addInventoryModal" class="hidden absolute inset-0 z-[60] bg-white dark:bg-nightSurface p-6 flex flex-col h-full">
+            <div class="flex items-center gap-4 mb-8 pt-4">
+                <button onclick="closeAddInventoryModal()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-xl dark:text-white">←</button>
+                <h3 class="font-black text-2xl dark:text-white">Track Item</h3>
+            </div>
+            <div class="space-y-6 flex-1">
+                <div>
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Item Name</label>
+                    <input type="text" id="invName" placeholder="e.g. Protein Powder" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-orange-400 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Price (₹)</label>
+                        <input type="number" id="invPrice" placeholder="0.00" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-orange-400 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Quantity</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="invQty" placeholder="1" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-orange-400 outline-none">
+                            <select id="invUnit" class="bg-gray-100 dark:bg-black rounded-2xl font-bold px-2 dark:text-white border-2 border-transparent focus:border-orange-400 outline-none">
+                                <option value="pcs">pcs</option>
+                                <option value="kg">kg</option>
+                                <option value="g">g</option>
+                                <option value="L">L</option>
+                                <option value="ml">ml</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Start Date</label>
+                    <input type="date" id="invDate" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-orange-400 outline-none">
+                </div>
+            </div>
+            <button onclick="saveInventoryItem()" class="btn-3d w-full py-4 rounded-2xl bg-orange-500 text-white font-bold border-b-4 border-orange-700 mb-6">Start Tracking ⏱️</button>
+        </div>
+
+        <!-- INSIGHTS MODAL -->
         <div id="insightsModal" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeInsights()"></div>
             <div class="w-full h-[90vh] bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl flex flex-col relative z-10 pb-8">
@@ -362,11 +414,12 @@
 
     </div>
 
-    <!-- JS LOGIC (PRESERVED) -->
+    <!-- JS LOGIC -->
     <script>
         const ENTRIES_PER_PAGE = 5;
         const STORAGE_KEY = 'budget_entries';
         const CATEGORIES_KEY = 'budget_categories';
+        const INVENTORY_KEY = 'budget_inventory';
         const API_KEY_STORAGE = 'gemini_api_key';
         const BUDGET_LIMIT_KEY = 'budget_limit';
 
@@ -379,19 +432,10 @@
             { id: '6', name: 'Misc', icon: '📦', type: 'emoji' }
         ];
 
-        // Pastel/Cartoon Colors for Chart
         const CHART_COLORS = [
-            '#F472B6', // Pink
-            '#60A5FA', // Blue
-            '#34D399', // Green
-            '#FBBF24', // Yellow
-            '#A78BFA', // Purple
-            '#FB923C', // Orange
-            '#2DD4BF', // Teal
-            '#F87171'  // Red
+            '#F472B6', '#60A5FA', '#34D399', '#FBBF24', '#A78BFA', '#FB923C', '#2DD4BF', '#F87171'
         ];
         
-        // Environment API Key Injection
         const apiKey = ""; 
 
         let recognition = null;
@@ -405,14 +449,46 @@
         let editingCategoryId = null;
         let currentGeneratedIcon = null;
         let monthlyLimit = parseFloat(localStorage.getItem(BUDGET_LIMIT_KEY)) || 0;
-        
+        let inventory = [];
+        let confirmCallback = null; // Handler for custom confirm modal
+
         function getApiKey() {
              return localStorage.getItem(API_KEY_STORAGE) || apiKey;
+        }
+
+        function setupSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) { document.getElementById('voiceBtn').disabled = true; return; }
+            recognition = new SpeechRecognition(); 
+            recognition.continuous = false; 
+            recognition.interimResults = true; 
+            recognition.lang = 'en-US';
+            
+            recognition.onstart = () => { 
+                isListening = true; 
+                document.getElementById('voiceBtn').classList.add('animate-pulse'); 
+                document.getElementById('voiceText').value = 'Listening...'; 
+            };
+            
+            recognition.onresult = (event) => { 
+                let interimTranscript = ""; 
+                for (let i = event.resultIndex; i < event.results.length; i++) { 
+                    const transcript = event.results[i][0].transcript; 
+                    if (event.results[i].isFinal) document.getElementById("voiceText").value = transcript; 
+                    else interimTranscript += transcript; 
+                } 
+            };
+            
+            recognition.onend = () => { 
+                isListening = false; 
+                document.getElementById('voiceBtn').classList.remove('animate-pulse'); 
+            };
         }
 
         function init() {
             initTheme();
             loadCategories();
+            loadInventory();
             setupSpeechRecognition();
             updateDateDisplay();
             attachEventListeners();
@@ -430,9 +506,7 @@
         function saveSettings() {
             const keyVal = document.getElementById('apiKeyInput').value.trim();
             const budgetVal = parseFloat(document.getElementById('budgetLimitInput').value.trim());
-            // Only update storage if user typed something, otherwise keep existing
             localStorage.setItem(API_KEY_STORAGE, keyVal);
-            
             monthlyLimit = isNaN(budgetVal) ? 0 : budgetVal;
             localStorage.setItem(BUDGET_LIMIT_KEY, monthlyLimit);
             closeSettings();
@@ -450,16 +524,14 @@
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
         function resetApp() {
-            if(confirm("Wait! This deletes EVERYTHING forever. You sure?")) {
+            showConfirm("Wait! This deletes EVERYTHING forever. You sure?", "danger", () => {
                 localStorage.clear();
                 window.location.reload();
-            }
+            });
         }
 
         async function callGemini(prompt) {
             const currentKey = getApiKey();
-            // Removed strict validation block to allow system key usage
-            
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${currentKey}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -480,8 +552,41 @@
             if(!select) return;
             select.innerHTML = categories.map(cat => `<option value="${cat.name}">${cat.type === 'svg' ? '🎨' : cat.type === 'image' ? '🖼️' : cat.icon} ${cat.name}</option>`).join('');
         }
-        function openCategoryManager() { renderCategoryList(); document.getElementById('categoriesModal').classList.remove('hidden'); }
+        
+        function openCategoryManager() { 
+            document.getElementById('categoriesModal').classList.remove('hidden'); 
+            switchModalTab('tags'); 
+            renderCategoryList();
+        }
         function closeCategoryManager() { document.getElementById('categoriesModal').classList.add('hidden'); }
+        
+        function switchModalTab(tab) {
+            const btnTags = document.getElementById('tabTags');
+            const btnStash = document.getElementById('tabStash');
+            const viewTags = document.getElementById('viewTags');
+            const viewStash = document.getElementById('viewStash');
+            
+            const activeClass = "bg-white dark:bg-nightSurface shadow-sm text-dark dark:text-white";
+            const inactiveClass = "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300";
+            
+            if (tab === 'tags') {
+                btnTags.className = `flex-1 py-2 text-xs font-bold rounded-lg transition-all ${activeClass}`;
+                btnStash.className = `flex-1 py-2 text-xs font-bold rounded-lg transition-all ${inactiveClass}`;
+                viewTags.classList.remove('hidden');
+                viewTags.classList.add('flex');
+                viewStash.classList.add('hidden');
+                viewStash.classList.remove('flex');
+            } else {
+                btnTags.className = `flex-1 py-2 text-xs font-bold rounded-lg transition-all ${inactiveClass}`;
+                btnStash.className = `flex-1 py-2 text-xs font-bold rounded-lg transition-all ${activeClass}`;
+                viewTags.classList.add('hidden');
+                viewTags.classList.remove('flex');
+                viewStash.classList.remove('hidden');
+                viewStash.classList.add('flex');
+                renderInventory(); 
+            }
+        }
+
         function renderCategoryList() {
             const list = document.getElementById('categoryListContainer');
             list.innerHTML = categories.map(cat => {
@@ -529,7 +634,6 @@
             preview.innerHTML = '<span class="animate-bounce">🎨</span>';
             
             try {
-                // Use Imagen 3.0 for realistic images
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${getApiKey()}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -545,12 +649,9 @@
                 if(data.predictions && data.predictions[0] && data.predictions[0].bytesBase64Encoded) {
                     const base64 = data.predictions[0].bytesBase64Encoded;
                     const imgUrl = `data:image/png;base64,${base64}`;
-                    
                     preview.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover" />`;
                     currentGeneratedIcon = { icon: imgUrl, type: 'image' };
-                } else {
-                    throw new Error("No image returned");
-                }
+                } else { throw new Error("No image returned"); }
                 
             } catch (err) { 
                 console.error(err); 
@@ -572,16 +673,135 @@
             saveCategories(); closeAddCategoryModal(); renderCategoryList(); renderTransactions();
         }
         function editCategory(id) { openAddCategoryModal(id); }
-        function deleteCategory(id) { if(!confirm("Delete this tag?")) return; categories = categories.filter(c => c.id !== id); saveCategories(); renderCategoryList(); }
-
-        function setupSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { document.getElementById('voiceBtn').disabled = true; return; }
-            recognition = new SpeechRecognition(); recognition.continuous = false; recognition.interimResults = true; recognition.lang = 'en-US';
-            recognition.onstart = () => { isListening = true; document.getElementById('voiceBtn').classList.add('animate-pulse'); document.getElementById('voiceText').value = 'Listening...'; };
-            recognition.onresult = (event) => { let interimTranscript = ""; for (let i = event.resultIndex; i < event.results.length; i++) { const transcript = event.results[i][0].transcript; if (event.results[i].isFinal) document.getElementById("voiceText").value = transcript; else interimTranscript += transcript; } };
-            recognition.onend = () => { isListening = false; document.getElementById('voiceBtn').classList.remove('animate-pulse'); };
+        function deleteCategory(id) { 
+            showConfirm("Delete this tag?", "danger", () => {
+                categories = categories.filter(c => c.id !== id); 
+                saveCategories(); 
+                renderCategoryList(); 
+            });
         }
+
+        // --- INVENTORY FUNCTIONS ---
+        function loadInventory() {
+            const stored = localStorage.getItem(INVENTORY_KEY);
+            inventory = stored ? JSON.parse(stored) : [];
+        }
+        function saveInventory() { localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory)); }
+        function openAddInventoryModal() { 
+            document.getElementById('addInventoryModal').classList.remove('hidden'); 
+            document.getElementById('invDate').valueAsDate = new Date();
+        }
+        function closeAddInventoryModal() { document.getElementById('addInventoryModal').classList.add('hidden'); }
+        
+        function saveInventoryItem() {
+            const name = document.getElementById('invName').value.trim();
+            const price = parseFloat(document.getElementById('invPrice').value);
+            const qty = document.getElementById('invQty').value;
+            const unit = document.getElementById('invUnit').value;
+            const dateVal = document.getElementById('invDate').value;
+            
+            if (!name || isNaN(price)) return alert("Name & Price required!");
+            
+            const newItem = {
+                id: Date.now(),
+                name,
+                price,
+                qty: `${qty}${unit}`,
+                startDate: dateVal,
+                endDate: null,
+                active: true
+            };
+            inventory.push(newItem);
+            saveInventory();
+            closeAddInventoryModal();
+            renderInventory();
+            showStatus("Item Tracked! 📦", "success");
+        }
+
+        // NEW: Show Confirm Modal
+        function showConfirm(msg, type, callback) {
+            document.getElementById('confirmMsg').textContent = msg;
+            const btn = document.getElementById('confirmYesBtn');
+            const modal = document.getElementById('confirmModal');
+            
+            if (type === 'danger') {
+                btn.className = "flex-1 btn-3d py-3 rounded-xl bg-red-500 text-white font-bold border-b-4 border-red-700";
+            } else {
+                btn.className = "flex-1 btn-3d py-3 rounded-xl bg-green-500 text-white font-bold border-b-4 border-green-700";
+            }
+            
+            modal.classList.remove('hidden');
+            confirmCallback = callback;
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            confirmCallback = null;
+        }
+
+        function finishItem(id) {
+            const item = inventory.find(i => i.id === id);
+            if(item) {
+                showConfirm("Finish this item?", "success", () => {
+                    item.active = false;
+                    item.endDate = new Date().toISOString().split('T')[0];
+                    saveInventory();
+                    renderInventory();
+                    showStatus("Finished! 🎉", "success");
+                });
+            }
+        }
+
+        function deleteInventoryItem(id) {
+            showConfirm("Delete this item record?", "danger", () => {
+                inventory = inventory.filter(i => i.id !== id);
+                saveInventory();
+                renderInventory();
+                showStatus("Deleted! 🗑️", "success");
+            });
+        }
+
+        function renderInventory() {
+            const list = document.getElementById('inventoryListContainer');
+            if (inventory.length === 0) {
+                list.innerHTML = `<div class="text-center py-10 opacity-50 dark:text-white"><div class="text-4xl mb-2">📦</div><p>Empty Inventory</p></div>`;
+                return;
+            }
+            
+            const now = new Date();
+            list.innerHTML = inventory.slice().reverse().map(item => {
+                const start = new Date(item.startDate);
+                const end = item.endDate ? new Date(item.endDate) : now;
+                const diffTime = Math.abs(end - start);
+                const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1; 
+                const costPerDay = (item.price / days).toFixed(2);
+                
+                const statusColor = item.active ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300";
+                const statusText = item.active ? `Running: Day ${days}` : `Lasted: ${days} Days`;
+
+                return `
+                <div class="p-4 bg-gray-50 dark:bg-black rounded-2xl border-2 border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden">
+                    ${!item.active ? '<div class="absolute inset-0 bg-gray-50/50 dark:bg-black/50 z-10 pointer-events-none"></div>' : ''}
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h4 class="font-black text-lg text-dark dark:text-white">${item.name}</h4>
+                            <p class="text-xs font-bold text-gray-400">${item.qty} • ₹${item.price}</p>
+                        </div>
+                        <div class="flex gap-2 relative z-20">
+                            ${item.active ? `<button onclick="finishItem(${item.id})" class="p-2 bg-green-500 text-white rounded-lg btn-3d border-b-4 border-green-700">✓</button>` : ''}
+                            <button onclick="deleteInventoryItem(${item.id})" class="p-2 bg-red-100 text-red-500 rounded-lg btn-3d">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${statusText}</span>
+                        <span class="text-xs font-bold text-gray-400">₹${costPerDay}/day</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- END INVENTORY FUNCTIONS ---
+
         function attachEventListeners() {
             document.getElementById('voiceBtn').addEventListener('click', toggleVoiceMode);
             document.getElementById('manualBtn').addEventListener('click', toggleManualMode);
@@ -595,6 +815,13 @@
             document.getElementById('analyticsBtn').addEventListener('click', openInsights);
             document.getElementById('categoriesNavBtn').addEventListener('click', openCategoryManager);
             document.getElementById('settingsNavBtn').addEventListener('click', openSettings);
+            
+            // Confirm Modal Listeners
+            document.getElementById('confirmNoBtn').addEventListener('click', closeConfirm);
+            document.getElementById('confirmYesBtn').addEventListener('click', () => {
+                if (confirmCallback) confirmCallback();
+                closeConfirm();
+            });
         }
         async function processVoiceEntryWithAI() {
             const text = document.getElementById('voiceText').value.trim();
