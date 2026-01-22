@@ -16,12 +16,19 @@
                     fontFamily: { sans: ['Nunito', 'sans-serif'] },
                     colors: {
                         night: '#0F172A',
-                        nightSurface: '#1E293B'
+                        nightSurface: '#1E293B',
+                        // Dynamic Theme Colors linked to CSS Variables
+                        theme: {
+                            from: 'var(--bg-from)',
+                            to: 'var(--bg-to)',
+                            accent: 'var(--accent-color)',
+                            dark: 'var(--accent-dark)', // For button borders
+                        }
                     },
                     boxShadow: {
                         '3d': '0 4px 0 0 rgba(0,0,0,0.1)',
                         '3d-active': '0 0 0 0 rgba(0,0,0,0)',
-                        'btn-primary': '0 4px 0 0 #2563EB',
+                        'btn-primary': '0 4px 0 0 rgba(0,0,0,0.2)',
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
@@ -38,6 +45,21 @@
         }
     </script>
     <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            /* Default: Ocean / Sky Blue */
+            --bg-from: #38BDF8;   /* Sky 400 */
+            --bg-to: #BFDBFE;     /* Blue 200 */
+            --accent-color: #3B82F6; /* Blue 500 */
+            --accent-dark: #1D4ED8;  /* Blue 700 */
+        }
+        
+        /* Dark Mode Overrides */
+        html.dark body {
+             --bg-from: #0F172A; /* Night */
+             --bg-to: #1E1B4B;
+        }
+
         body { 
             -webkit-tap-highlight-color: transparent;
             font-family: 'Nunito', sans-serif;
@@ -76,10 +98,12 @@
             50% { opacity: 1; transform: scale(1.2); }
         }
         .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        .theme-swatch.active { border-color: #1F2937; transform: scale(1.1); }
     </style>
 </head>
-<body class="flex justify-center bg-gradient-to-b from-sky-400 to-blue-200 dark:from-slate-900 dark:to-slate-800 transition-colors duration-500 selection:bg-yellow-200 selection:text-yellow-900">
+<body class="flex justify-center bg-gradient-to-b from-theme-from to-theme-to transition-colors duration-1000 selection:bg-yellow-200 selection:text-yellow-900">
 
+    <!-- Background Elements -->
     <div class="absolute top-10 left-[-20px] w-32 h-12 cloud animate-float blur-sm"></div>
     <div class="absolute top-40 right-[-30px] w-40 h-14 cloud animate-float-delayed blur-sm"></div>
     <div class="absolute bottom-20 left-10 w-24 h-8 cloud animate-float opacity-50"></div>
@@ -99,6 +123,7 @@
         <div class="flex-1 overflow-y-auto no-scrollbar scroll-smooth pb-32 w-full">
             
             <div class="px-6 pt-10 pb-4">
+                <!-- Top Bar -->
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex flex-col items-start">
                         <h2 class="text-xs font-bold uppercase tracking-wider text-blue-900 dark:text-blue-200 opacity-80 mb-1 ml-1">Today is</h2>
@@ -107,12 +132,13 @@
                         </div>
                     </div>
                     
-                    <div class="flex gap-3">
+                    <!-- HEADER BUTTONS -->
+                    <div class="flex gap-2">
                         <button id="themeToggle" class="btn-3d w-12 h-12 bg-white dark:bg-nightSurface text-2xl rounded-2xl flex items-center justify-center shadow-3d active:shadow-none border-b-4 border-gray-200 dark:border-black transition-transform">
                             <span id="sunIcon" class="hidden">☀️</span>
                             <span id="moonIcon" class="">🌙</span>
                         </button>
-                        <button id="manualBtn" class="btn-3d w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center text-xl shadow-btn-primary border-b-4 border-yellow-600 text-yellow-900 transition-transform">
+                        <button id="manualBtn" class="btn-3d w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center text-xl shadow-[0_4px_0_0_#ca8a04] border-b-4 border-yellow-600 text-yellow-900 transition-transform">
                             ✏️
                         </button>
                     </div>
@@ -123,7 +149,7 @@
                     
                     <div class="relative z-10 text-center">
                         <h1 class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Total Spent</h1>
-                        <div class="text-5xl font-black text-blue-600 dark:text-blue-400 mb-4 tracking-tight flex justify-center items-start gap-1 drop-shadow-sm">
+                        <div class="text-5xl font-black text-theme-accent mb-4 tracking-tight flex justify-center items-start gap-1 drop-shadow-sm">
                             <span class="text-2xl mt-1 opacity-60">₹</span>
                             <span id="totalSpentDisplay">0</span>
                         </div>
@@ -163,22 +189,23 @@
 
         <!-- FIXED FOOTER ELEMENTS -->
         <div class="absolute bottom-6 left-6 right-6 bg-white dark:bg-nightSurface rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center text-gray-400 text-[10px] font-bold z-30 safe-area-bottom">
-            <div class="flex flex-col items-center text-blue-500 dark:text-blue-400 cursor-pointer active:scale-90 transition-transform" onclick="window.location.reload()">
+            <div class="flex flex-col items-center text-theme-accent cursor-pointer active:scale-90 transition-transform" onclick="window.location.reload()">
                 <div class="text-2xl mb-1">🏠</div>
                 Home
             </div>
-            <!-- Analytics Button -->
-            <div id="analyticsBtn" onclick="openInsights()" class="flex flex-col items-center hover:text-purple-500 cursor-pointer active:scale-90 transition-transform">
-                <div class="text-2xl mb-1">📊</div>
-                Analytics
+            <!-- SPLIT -->
+            <div id="splitBtn" onclick="openSplitApp()" class="flex flex-col items-center hover:text-purple-500 cursor-pointer active:scale-90 transition-transform">
+                <div class="text-2xl mb-1">🤝</div>
+                Split
             </div>
-            <div class="w-12"></div>
-            <!-- Tags Button (contains Inventory) -->
+            
+            <div class="w-12"></div> <!-- Spacer for FAB -->
+            
             <div id="categoriesNavBtn" class="flex flex-col items-center hover:text-green-500 cursor-pointer active:scale-90 transition-transform">
                 <div class="text-2xl mb-1">🏷️</div>
-                Tags
+                Category
             </div>
-            <div id="settingsNavBtn" class="flex flex-col items-center hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer active:scale-90 transition-transform">
+            <div id="settingsNavBtn" onclick="openSettings()" class="flex flex-col items-center hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer active:scale-90 transition-transform">
                 <div class="text-2xl mb-1">⚙️</div>
                 Setup
             </div>
@@ -189,22 +216,109 @@
         </button>
 
         <!-- Modals and Status -->
-        <div id="statusMessage" class="hidden absolute top-24 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl text-sm font-bold shadow-xl border-b-4 z-50 transition-all duration-300 animate-bounce"></div>
+        <div id="statusMessage" class="hidden absolute top-24 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl text-sm font-black shadow-xl border-b-4 z-50 transition-all duration-300 animate-bounce"></div>
 
-        <!-- NEW: CUSTOM CONFIRMATION MODAL -->
+        <!-- CONFIRM MODAL -->
         <div id="confirmModal" class="hidden absolute inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <div class="bg-white dark:bg-nightSurface rounded-3xl p-6 w-3/4 max-w-sm shadow-2xl border-2 border-white/20 transform scale-100 animate-bounce-slow">
                 <h3 class="text-lg font-black text-dark dark:text-white mb-2">Are you sure?</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-6" id="confirmMsg">This action cannot be undone.</p>
                 <div class="flex gap-3">
                     <button id="confirmNoBtn" class="flex-1 btn-3d py-3 rounded-xl bg-gray-200 dark:bg-gray-700 font-bold text-gray-600 dark:text-gray-300 border-b-4 border-gray-300 dark:border-gray-900">No</button>
-                    <button id="confirmYesBtn" class="flex-1 btn-3d py-3 rounded-xl bg-blue-500 text-white font-bold border-b-4 border-blue-700">Yes</button>
+                    <button id="confirmYesBtn" class="flex-1 btn-3d py-3 rounded-xl bg-theme-accent text-white font-bold border-b-4 border-theme-dark">Yes</button>
                 </div>
             </div>
         </div>
 
+        <!-- SPLIT MODAL -->
+        <div id="splitModal" class="hidden absolute inset-0 z-50 flex items-end">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeSplitApp()"></div>
+            <div class="w-full h-[90vh] bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl flex flex-col relative z-10 pb-8">
+                <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-6"></div>
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-black text-2xl dark:text-white flex items-center gap-2">🤝 Split Bill</h3>
+                    <div class="flex gap-2">
+                        <!-- Voice Button for Split -->
+                        <button onclick="toggleVoiceMode('split')" class="btn-3d w-10 h-10 bg-red-100 text-red-500 rounded-xl flex items-center justify-center text-lg border-b-4 border-red-200">🎙️</button>
+                        <button onclick="openAddFriendModal()" class="btn-3d bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-white text-xs px-3 py-2 rounded-xl font-bold border-b-4 border-gray-300 dark:border-gray-900">Add Friend</button>
+                        <button onclick="openAddSplitModal()" class="btn-3d bg-theme-accent text-white text-xs px-4 py-2 rounded-xl font-bold border-b-4 border-theme-dark">New Split</button>
+                    </div>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto pr-1 no-scrollbar pb-4">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border-2 border-blue-100 dark:border-blue-900 mb-6 text-center">
+                        <p class="text-xs font-bold text-blue-400 uppercase tracking-widest">My Net Balance</p>
+                        <h2 id="splitNetBalance" class="text-4xl font-black text-gray-800 dark:text-white mt-1">₹0</h2>
+                        <p class="text-xs text-gray-400 mt-1">(Positive = They owe you)</p>
+                    </div>
+                    <h4 class="font-bold text-gray-400 text-sm uppercase mb-3">Friends & Balances</h4>
+                    <div id="friendsList" class="space-y-3"></div>
+                </div>
+                <button onclick="closeSplitApp()" class="btn-3d mt-2 w-full py-4 rounded-2xl bg-gray-200 dark:bg-gray-700 font-bold text-gray-600 dark:text-gray-300 border-b-4 border-gray-300 dark:border-gray-900">Close</button>
+            </div>
+        </div>
+
+        <!-- FRIEND HISTORY MODAL -->
+        <div id="friendHistoryModal" class="hidden absolute inset-0 z-[65] bg-white dark:bg-nightSurface p-6 flex flex-col h-full">
+            <div class="flex items-center gap-4 mb-6 pt-4">
+                <button onclick="closeFriendHistoryModal()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-xl dark:text-white">←</button>
+                <div class="flex flex-col">
+                    <h3 class="font-black text-2xl dark:text-white" id="historyFriendName">Friend</h3>
+                    <span class="text-xs text-gray-400 font-bold">Transaction History</span>
+                </div>
+            </div>
+            <div id="historyList" class="flex-1 overflow-y-auto space-y-4 pb-6"></div>
+        </div>
+
+        <!-- ADD FRIEND MODAL -->
+        <div id="addFriendModal" class="hidden absolute inset-0 z-[60] bg-white dark:bg-nightSurface p-6 flex flex-col h-full">
+            <div class="flex items-center gap-4 mb-8 pt-4">
+                <button onclick="closeAddFriendModal()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-xl dark:text-white">←</button>
+                <h3 class="font-black text-2xl dark:text-white">Add Friend</h3>
+            </div>
+            <div class="space-y-6 flex-1">
+                <div>
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Friend's Name</label>
+                    <input type="text" id="newFriendName" placeholder="e.g. Rahul" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-theme-accent outline-none">
+                </div>
+            </div>
+            <button onclick="saveFriend()" class="btn-3d w-full py-4 rounded-2xl bg-theme-accent text-white font-bold border-b-4 border-theme-dark mb-6">Add Friend</button>
+        </div>
+
+        <!-- ADD SPLIT EXPENSE MODAL (WITH DATE) -->
+        <div id="addSplitModal" class="hidden absolute inset-0 z-[60] bg-white dark:bg-nightSurface p-6 flex flex-col h-full">
+            <div class="flex items-center gap-4 mb-8 pt-4">
+                <button onclick="closeAddSplitModal()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-xl dark:text-white">←</button>
+                <h3 class="font-black text-2xl dark:text-white">Split Expense</h3>
+            </div>
+            <div class="space-y-6 flex-1 overflow-y-auto pb-6">
+                <!-- NEW: DATE PICKER -->
+                <div>
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Date</label>
+                    <input type="date" id="splitDate" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-theme-accent outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Total Bill Amount</label>
+                    <input type="number" id="splitAmount" placeholder="0.00" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-theme-accent outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">For What?</label>
+                    <input type="text" id="splitDesc" placeholder="e.g. Dinner" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-theme-accent outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Who Paid?</label>
+                    <div class="flex gap-2 mt-2 overflow-x-auto no-scrollbar" id="payerList"></div>
+                </div>
+                <div>
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Split Between (Select)</label>
+                    <div class="mt-2 space-y-2" id="involvedList"></div>
+                </div>
+            </div>
+            <button onclick="saveSplitExpense()" class="btn-3d w-full py-4 rounded-2xl bg-green-500 text-white font-bold border-b-4 border-green-700 mb-6">Split It! 💸</button>
+        </div>
+
         <!-- VOICE MODAL -->
-        <div id="voiceInput" class="hidden absolute inset-0 z-50 flex items-end">
+        <div id="voiceInput" class="hidden absolute inset-0 z-[80] flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="document.getElementById('cancelVoiceBtn').click()"></div>
             <div class="w-full bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl animate-bounce-slow relative z-10 pb-8">
                 <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-6"></div>
@@ -212,7 +326,7 @@
                     <div class="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4 mic-pulse text-4xl">🎙️</div>
                     <h3 class="text-center font-black text-2xl mb-2 dark:text-white" id="voiceStatusText">Listening...</h3>
                     <input type="text" id="voiceText" placeholder="Speak now..." disabled class="w-full text-center text-xl font-bold p-4 bg-transparent dark:text-white focus:outline-none mb-2 placeholder-gray-300">
-                    <p class="text-xs font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 py-2 px-4 rounded-full inline-block">Say: "Burger 150 Rupees"</p>
+                    <p class="text-xs font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 py-2 px-4 rounded-full inline-block" id="voiceHint">Say: "Burger 150 Rupees"</p>
                 </div>
                 <div id="aiProcessing" class="hidden text-center mb-8">
                     <div class="text-6xl mb-4 animate-spin">✨</div>
@@ -221,7 +335,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <button id="cancelVoiceBtn" class="btn-3d py-3 rounded-2xl bg-gray-200 dark:bg-gray-700 font-bold text-gray-600 dark:text-gray-300 border-b-4 border-gray-300 dark:border-gray-900">Cancel</button>
-                    <button id="saveVoiceBtn" class="btn-3d py-3 rounded-2xl bg-blue-500 text-white font-bold border-b-4 border-blue-700">Save ✨</button>
+                    <button id="saveVoiceBtn" class="btn-3d py-3 rounded-2xl bg-theme-accent text-white font-bold border-b-4 border-theme-dark">Save ✨</button>
                 </div>
                 <div class="h-6"></div>
             </div>
@@ -236,17 +350,17 @@
                 <div class="space-y-4">
                     <div>
                         <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">What was it?</label>
-                        <input type="text" id="manualText" placeholder="e.g. Pizza Party" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-blue-400 focus:bg-white dark:focus:bg-gray-900 transition-all outline-none">
+                        <input type="text" id="manualText" placeholder="e.g. Pizza Party" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-blue-400 transition-all outline-none">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Cost</label>
-                            <input type="number" id="manualAmount" placeholder="0.00" min="0" step="0.01" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-green-400 focus:bg-white dark:focus:bg-gray-900 transition-all outline-none">
+                            <input type="number" id="manualAmount" placeholder="0.00" min="0" step="0.01" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-green-400 transition-all outline-none">
                         </div>
                         <div>
                             <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Type</label>
                             <div class="relative">
-                                <select id="manualCategory" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-purple-400 focus:bg-white dark:focus:bg-gray-900 transition-all outline-none appearance-none"></select>
+                                <select id="manualCategory" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-purple-400 transition-all outline-none appearance-none"></select>
                                 <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400">▼</div>
                             </div>
                         </div>
@@ -260,20 +374,15 @@
             </div>
         </div>
 
-        <!-- CATEGORIES MODAL (Now includes Inventory) -->
+        <!-- CATEGORIES MODAL -->
         <div id="categoriesModal" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeCategoryManager()"></div>
             <div class="w-full h-[85vh] bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl flex flex-col relative z-10 pb-8">
                 <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
-                
-                <!-- Tab Switcher -->
                 <div class="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-xl mb-4">
-                    <button id="tabTags" onclick="switchModalTab('tags')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-nightSurface shadow-sm text-dark dark:text-white transition-all">🏷️ Tags</button>
-                    <!-- RENAMED TO INVENTORY -->
+                    <button id="tabTags" onclick="switchModalTab('tags')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-nightSurface shadow-sm text-dark dark:text-white transition-all">🏷️ Category</button>
                     <button id="tabStash" onclick="switchModalTab('stash')" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all">📦 Inventory</button>
                 </div>
-
-                <!-- VIEW 1: TAGS LIST -->
                 <div id="viewTags" class="flex flex-col flex-1 overflow-hidden">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-black text-xl dark:text-white">Your Categories</h3>
@@ -281,17 +390,13 @@
                     </div>
                     <div id="categoryListContainer" class="flex-1 overflow-y-auto space-y-3 pr-1 pb-4"></div>
                 </div>
-
-                <!-- VIEW 2: INVENTORY -->
                 <div id="viewStash" class="hidden flex-col flex-1 overflow-hidden">
                     <div class="flex justify-between items-center mb-4">
-                        <!-- RENAMED TO INVENTORY -->
                         <h3 class="font-black text-xl dark:text-white">Inventory</h3>
                         <button onclick="openAddInventoryModal()" class="btn-3d bg-orange-500 text-white text-xs px-4 py-2 rounded-xl font-bold border-b-4 border-orange-700 active:translate-y-1 active:shadow-none transition-all">＋ Add Item</button>
                     </div>
                     <div id="inventoryListContainer" class="flex-1 overflow-y-auto space-y-3 pr-1 pb-4"></div>
                 </div>
-
                 <button onclick="closeCategoryManager()" class="btn-3d mt-2 w-full py-4 rounded-2xl bg-gray-200 dark:bg-gray-700 font-bold text-gray-600 dark:text-gray-300 border-b-4 border-gray-300 dark:border-gray-900">Done</button>
             </div>
         </div>
@@ -299,11 +404,11 @@
         <div id="addCategoryModal" class="hidden absolute inset-0 z-[60] bg-white dark:bg-nightSurface p-6 flex flex-col h-full">
             <div class="flex items-center gap-4 mb-8 pt-4">
                 <button onclick="closeAddCategoryModal()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-xl dark:text-white">←</button>
-                <h3 class="font-black text-2xl dark:text-white" id="catModalTitle">New Tag</h3>
+                <h3 class="font-black text-2xl dark:text-white" id="catModalTitle">New Category</h3>
             </div>
             <div class="space-y-8 flex-1">
                 <div>
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Tag Name</label>
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-wider ml-1">Category Name</label>
                     <input type="text" id="newCategoryName" placeholder="e.g. Lego Sets" class="w-full p-4 bg-gray-100 dark:bg-black rounded-2xl text-dark dark:text-white font-bold border-2 border-transparent focus:border-blue-400 transition-all outline-none mt-2">
                 </div>
                 <div class="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-3xl border-2 border-purple-100 dark:border-purple-900/50">
@@ -354,39 +459,21 @@
             <button onclick="saveInventoryItem()" class="btn-3d w-full py-4 rounded-2xl bg-orange-500 text-white font-bold border-b-4 border-orange-700 mb-6">Start Tracking ⏱️</button>
         </div>
 
-        <!-- INSIGHTS MODAL -->
-        <div id="insightsModal" class="hidden absolute inset-0 z-50 flex items-end">
-            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeInsights()"></div>
-            <div class="w-full h-[90vh] bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl flex flex-col relative z-10 pb-8">
-                <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-6"></div>
-                <div class="flex items-center gap-3 mb-6">
-                    <h3 class="font-black text-2xl dark:text-white">Vibe Check</h3>
-                    <span class="px-3 py-1 bg-gradient-to-r from-purple-400 to-pink-500 text-white text-[10px] rounded-full font-bold shadow-md">AI POWERED</span>
-                </div>
-                
-                <div class="flex-1 overflow-y-auto pr-1 no-scrollbar pb-4">
-                    <div id="insightsContent" class="mb-8 bg-blue-50 dark:bg-blue-900/20 rounded-3xl p-5 text-sm font-semibold leading-relaxed text-gray-700 dark:text-gray-300 border-2 border-blue-100 dark:border-blue-900/30 relative"></div>
-                    <div id="spendingVisuals" class="mb-6 flex flex-col items-center">
-                        <div class="relative w-64 h-64 mb-6">
-                            <canvas id="budgetChart" width="256" height="256"></canvas>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <span class="text-xs font-bold text-gray-400 uppercase">Total</span>
-                                <span id="chartTotal" class="text-3xl font-black text-dark dark:text-white">₹0</span>
-                            </div>
-                        </div>
-                        <div id="chartLegend" class="w-full space-y-3"></div>
-                    </div>
-                </div>
-                <button onclick="closeInsights()" class="btn-3d mt-2 w-full py-4 rounded-2xl bg-gray-200 dark:bg-gray-700 font-bold text-gray-600 dark:text-gray-300 border-b-4 border-gray-300 dark:border-gray-900">Cool, Thanks</button>
-            </div>
-        </div>
-
         <div id="settingsModal" class="hidden absolute inset-0 z-50 flex items-end">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeSettings()"></div>
             <div class="w-full h-[80vh] bg-white dark:bg-nightSurface rounded-t-[40px] p-6 shadow-2xl flex flex-col relative z-10 pb-8">
                 <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-6"></div>
                 <h3 class="font-black text-2xl dark:text-white mb-8">Settings</h3>
                 <div class="space-y-8 flex-1 overflow-y-auto">
+                    <div>
+                        <h4 class="text-xs font-black text-blue-500 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Theme</h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="setTheme('ocean')" class="theme-swatch p-4 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-200 text-white font-bold shadow-sm border-2 border-transparent">Ocean 🌊</button>
+                            <button onclick="setTheme('forest')" class="theme-swatch p-4 rounded-2xl bg-gradient-to-br from-green-400 to-green-100 text-green-900 font-bold shadow-sm border-2 border-transparent">Forest 🌲</button>
+                            <button onclick="setTheme('royal')" class="theme-swatch p-4 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-200 text-purple-900 font-bold shadow-sm border-2 border-transparent">Royal 👑</button>
+                            <button onclick="setTheme('sunset')" class="theme-swatch p-4 rounded-2xl bg-gradient-to-br from-orange-400 to-red-200 text-red-900 font-bold shadow-sm border-2 border-transparent">Sunset 🌅</button>
+                        </div>
+                    </div>
                     <div>
                         <h4 class="text-xs font-black text-blue-500 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Preferences</h4>
                         <div class="space-y-4">
@@ -408,7 +495,7 @@
                         </div>
                     </div>
                 </div>
-                <button onclick="saveSettings()" class="btn-3d w-full py-4 rounded-2xl bg-blue-500 text-white font-bold border-b-4 border-blue-700 mb-4 mt-4">Save & Close</button>
+                <button onclick="saveSettings()" class="btn-3d w-full py-4 rounded-2xl bg-theme-accent text-white font-bold border-b-4 border-theme-dark mt-4">Save & Close</button>
             </div>
         </div>
 
@@ -420,8 +507,11 @@
         const STORAGE_KEY = 'budget_entries';
         const CATEGORIES_KEY = 'budget_categories';
         const INVENTORY_KEY = 'budget_inventory';
+        const FRIENDS_KEY = 'budget_friends';
+        const SPLIT_TRANSACTIONS_KEY = 'budget_split_transactions';
         const API_KEY_STORAGE = 'gemini_api_key';
         const BUDGET_LIMIT_KEY = 'budget_limit';
+        const THEME_KEY = 'budget_theme';
 
         const DEFAULT_CATEGORIES = [
             { id: '1', name: 'Food', icon: '🍔', type: 'emoji' },
@@ -432,16 +522,13 @@
             { id: '6', name: 'Misc', icon: '📦', type: 'emoji' }
         ];
 
-        const CHART_COLORS = [
-            '#F472B6', '#60A5FA', '#34D399', '#FBBF24', '#A78BFA', '#FB923C', '#2DD4BF', '#F87171'
-        ];
-        
         const apiKey = ""; 
 
         let recognition = null;
         let isListening = false;
         let currentPage = 0;
         let voiceMode = false;
+        let currentVoiceContext = 'main'; // 'main' or 'split'
         let manualMode = false;
         let viewMode = 'today';
         let editingEntryId = null;
@@ -450,10 +537,60 @@
         let currentGeneratedIcon = null;
         let monthlyLimit = parseFloat(localStorage.getItem(BUDGET_LIMIT_KEY)) || 0;
         let inventory = [];
-        let confirmCallback = null; // Handler for custom confirm modal
+        let friends = [];
+        let splitTransactions = [];
+        let confirmCallback = null; 
 
         function getApiKey() {
              return localStorage.getItem(API_KEY_STORAGE) || apiKey;
+        }
+
+        function initTheme() {
+            const html = document.documentElement;
+            if (localStorage.dark === 'true' || (!('dark' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                html.classList.add('dark');
+                document.getElementById('moonIcon').classList.add('hidden');
+                document.getElementById('sunIcon').classList.remove('hidden');
+            } else {
+                html.classList.remove('dark');
+                document.getElementById('moonIcon').classList.remove('hidden');
+                document.getElementById('sunIcon').classList.add('hidden');
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.dark = 'false';
+                document.getElementById('moonIcon').classList.remove('hidden');
+                document.getElementById('sunIcon').classList.add('hidden');
+            } else {
+                html.classList.add('dark');
+                localStorage.dark = 'true';
+                document.getElementById('moonIcon').classList.add('hidden');
+                document.getElementById('sunIcon').classList.remove('hidden');
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem(THEME_KEY) || 'ocean';
+            setTheme(savedTheme);
+            initTheme(); 
+        }
+
+        function setTheme(themeName) {
+            document.body.className = document.body.className.replace(/theme-\w+/g, '');
+            if (themeName !== 'ocean') {
+                document.body.classList.add(`theme-${themeName}`);
+            }
+            document.querySelectorAll('.theme-swatch').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.textContent.toLowerCase().includes(themeName)) {
+                    btn.classList.add('active');
+                }
+            });
+            localStorage.setItem(THEME_KEY, themeName);
         }
 
         function setupSpeechRecognition() {
@@ -463,38 +600,262 @@
             recognition.continuous = false; 
             recognition.interimResults = true; 
             recognition.lang = 'en-US';
-            
-            recognition.onstart = () => { 
-                isListening = true; 
-                document.getElementById('voiceBtn').classList.add('animate-pulse'); 
-                document.getElementById('voiceText').value = 'Listening...'; 
-            };
-            
-            recognition.onresult = (event) => { 
-                let interimTranscript = ""; 
-                for (let i = event.resultIndex; i < event.results.length; i++) { 
-                    const transcript = event.results[i][0].transcript; 
-                    if (event.results[i].isFinal) document.getElementById("voiceText").value = transcript; 
-                    else interimTranscript += transcript; 
-                } 
-            };
-            
-            recognition.onend = () => { 
-                isListening = false; 
-                document.getElementById('voiceBtn').classList.remove('animate-pulse'); 
-            };
+            recognition.onstart = () => { isListening = true; document.getElementById('voiceBtn').classList.add('animate-pulse'); document.getElementById('voiceText').value = 'Listening...'; };
+            recognition.onresult = (event) => { let interimTranscript = ""; for (let i = event.resultIndex; i < event.results.length; i++) { const transcript = event.results[i][0].transcript; if (event.results[i].isFinal) document.getElementById("voiceText").value = transcript; else interimTranscript += transcript; } };
+            recognition.onend = () => { isListening = false; document.getElementById('voiceBtn').classList.remove('animate-pulse'); };
         }
 
         function init() {
-            initTheme();
+            loadTheme();
             loadCategories();
             loadInventory();
+            loadFriends();
+            loadSplitTransactions();
             setupSpeechRecognition();
             updateDateDisplay();
             attachEventListeners();
             renderTransactions();
             updateDashboardCard();
             console.log('Budget Vibes Initialized');
+        }
+
+        function loadFriends() {
+            const stored = localStorage.getItem(FRIENDS_KEY);
+            friends = stored ? JSON.parse(stored) : [];
+        }
+        function saveFriends() {
+            localStorage.setItem(FRIENDS_KEY, JSON.stringify(friends));
+            renderFriendsList();
+            updateNetBalance();
+        }
+
+        function loadSplitTransactions() {
+            const stored = localStorage.getItem(SPLIT_TRANSACTIONS_KEY);
+            splitTransactions = stored ? JSON.parse(stored) : [];
+        }
+        
+        function openSplitApp() {
+            document.getElementById('splitModal').classList.remove('hidden');
+            renderFriendsList();
+            updateNetBalance();
+        }
+        function closeSplitApp() { document.getElementById('splitModal').classList.add('hidden'); }
+        
+        function openAddFriendModal() {
+            document.getElementById('addFriendModal').classList.remove('hidden');
+            document.getElementById('newFriendName').value = "";
+            document.getElementById('newFriendName').focus();
+        }
+        function closeAddFriendModal() { document.getElementById('addFriendModal').classList.add('hidden'); }
+        
+        function saveFriend() {
+            const name = document.getElementById('newFriendName').value.trim();
+            if (!name) return showStatus("Name needed!", "danger");
+            friends.push({ id: Date.now(), name: name, balance: 0 }); 
+            saveFriends();
+            closeAddFriendModal();
+            showStatus("Friend Added! 🤝", "success");
+        }
+        
+        function openAddSplitModal() {
+            document.getElementById('addSplitModal').classList.remove('hidden');
+            document.getElementById('splitAmount').value = "";
+            document.getElementById('splitDesc').value = "";
+            // DEFAULT DATE TO TODAY
+            document.getElementById('splitDate').valueAsDate = new Date();
+            renderSplitParticipants();
+        }
+        function closeAddSplitModal() { document.getElementById('addSplitModal').classList.add('hidden'); }
+
+        function renderSplitParticipants() {
+            const payerList = document.getElementById('payerList');
+            const involvedList = document.getElementById('involvedList');
+            let payerHtml = `<button onclick="selectPayer('me', this)" class="payer-btn px-4 py-2 bg-theme-accent text-white rounded-xl font-bold border-2 border-theme-dark whitespace-nowrap active" data-id="me">Me</button>`;
+            friends.forEach(f => {
+                payerHtml += `<button onclick="selectPayer('${f.id}', this)" class="payer-btn px-4 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold border-2 border-transparent whitespace-nowrap" data-id="${f.id}">${f.name}</button>`;
+            });
+            payerList.innerHTML = payerHtml;
+            let involvedHtml = `
+            <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-black/50 rounded-xl border border-gray-100 dark:border-gray-800">
+                <input type="checkbox" id="split_me" value="me" checked class="w-5 h-5 accent-theme-accent">
+                <label for="split_me" class="font-bold text-gray-700 dark:text-gray-200">Me</label>
+            </div>`;
+            friends.forEach(f => {
+                involvedHtml += `
+                <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-black/50 rounded-xl border border-gray-100 dark:border-gray-800">
+                    <input type="checkbox" id="split_${f.id}" value="${f.id}" checked class="w-5 h-5 accent-theme-accent">
+                    <label for="split_${f.id}" class="font-bold text-gray-700 dark:text-gray-200">${f.name}</label>
+                </div>`;
+            });
+            involvedList.innerHTML = involvedHtml;
+        }
+
+        let selectedPayerId = 'me';
+        function selectPayer(id, btn) {
+            selectedPayerId = id;
+            document.querySelectorAll('.payer-btn').forEach(b => {
+                b.classList.remove('bg-theme-accent', 'text-white', 'border-theme-dark', 'active');
+                b.classList.add('bg-gray-100', 'text-gray-600', 'border-transparent');
+            });
+            btn.classList.remove('bg-gray-100', 'text-gray-600', 'border-transparent');
+            btn.classList.add('bg-theme-accent', 'text-white', 'border-theme-dark', 'active');
+        }
+        function selectPayerById(id) {
+             selectedPayerId = id;
+             const btn = document.querySelector(`.payer-btn[data-id="${id}"]`);
+             if(btn) selectPayer(id, btn);
+        }
+
+        function saveSplitExpense() {
+            const amount = parseFloat(document.getElementById('splitAmount').value);
+            const desc = document.getElementById('splitDesc').value.trim();
+            // Retrieve Date from Input or default to today's locale string for display (saving ISO for sorting is better but using locale for consistency with existing)
+            // Let's use the date input value (YYYY-MM-DD) directly or format it nicely.
+            let dateVal = document.getElementById('splitDate').value;
+            if(!dateVal) dateVal = new Date().toISOString().split('T')[0];
+
+            // Format for display
+            const dateObj = new Date(dateVal);
+            const formattedDate = dateObj.toLocaleDateString(); // Simple local format
+
+            if(!amount || !desc) return showStatus("Fill details!", "danger");
+
+            const involvedCheckboxes = document.querySelectorAll('#involvedList input:checked');
+            const involvedIds = Array.from(involvedCheckboxes).map(cb => cb.value);
+            
+            if(involvedIds.length === 0) return showStatus("Who is involved?", "danger");
+
+            const splitShare = amount / involvedIds.length;
+
+            if (selectedPayerId === 'me') {
+                involvedIds.forEach(id => {
+                    if (id !== 'me') {
+                        const friend = friends.find(f => f.id == id);
+                        if (friend) friend.balance += splitShare;
+                    }
+                });
+            } else {
+                const payer = friends.find(f => f.id == selectedPayerId);
+                if (involvedIds.includes('me')) {
+                    if (payer) payer.balance -= splitShare;
+                }
+            }
+            
+            const transaction = {
+                id: Date.now(),
+                date: formattedDate, // Use formatted date
+                desc: desc,
+                amount: amount,
+                payerId: selectedPayerId,
+                involvedIds: involvedIds,
+                splitShare: splitShare
+            };
+            splitTransactions.push(transaction);
+            localStorage.setItem(SPLIT_TRANSACTIONS_KEY, JSON.stringify(splitTransactions));
+
+            saveFriends();
+            closeAddSplitModal();
+            showStatus("Split Saved! ✅", "success");
+        }
+
+        function settleUp(friendId) {
+            const friend = friends.find(f => f.id === friendId);
+            if(friend) {
+                showConfirm(`Settle up with ${friend.name}?`, 'success', () => {
+                    const transaction = {
+                        id: Date.now(),
+                        date: new Date().toLocaleDateString(),
+                        desc: "Settled Up",
+                        amount: Math.abs(friend.balance),
+                        payerId: friend.balance > 0 ? friendId : 'me', 
+                        involvedIds: ['me', friendId],
+                        splitShare: Math.abs(friend.balance),
+                        isSettlement: true
+                    };
+                    splitTransactions.push(transaction);
+                    localStorage.setItem(SPLIT_TRANSACTIONS_KEY, JSON.stringify(splitTransactions));
+
+                    friend.balance = 0;
+                    saveFriends();
+                    showStatus("Settled! 🤝", "success");
+                });
+            }
+        }
+
+        function deleteFriend(friendId) {
+            showConfirm("Remove this friend?", "danger", () => {
+                friends = friends.filter(f => f.id !== friendId);
+                saveFriends();
+            });
+        }
+
+        function viewFriendHistory(friendId) {
+            const friend = friends.find(f => f.id == friendId);
+            if(!friend) return;
+            document.getElementById('historyFriendName').textContent = friend.name;
+            const historyList = document.getElementById('historyList');
+            const relatedTx = splitTransactions.filter(tx => 
+                (tx.payerId == friendId && tx.involvedIds.includes('me')) || 
+                (tx.payerId == 'me' && tx.involvedIds.includes(String(friendId)))
+            ).sort((a,b) => b.id - a.id);
+
+            if(relatedTx.length === 0) {
+                 historyList.innerHTML = `<p class="text-center text-gray-400 mt-10">No history yet.</p>`;
+            } else {
+                historyList.innerHTML = relatedTx.map(tx => {
+                    let msg = "";
+                    let amountClass = "";
+                    if (tx.isSettlement) { msg = "Settled Up"; amountClass = "text-blue-500"; } 
+                    else if (tx.payerId == 'me') { msg = `You paid for ${tx.desc}`; amountClass = "text-green-500"; } 
+                    else { msg = `${friend.name} paid for ${tx.desc}`; amountClass = "text-red-500"; }
+                    return `<div class="p-3 bg-gray-50 dark:bg-black rounded-xl border border-gray-100 dark:border-gray-800 flex justify-between items-center"><div><p class="text-sm font-bold text-gray-800 dark:text-white">${msg}</p><p class="text-xs text-gray-400">${tx.date}</p></div><span class="font-bold ${amountClass}">₹${tx.splitShare.toFixed(0)}</span></div>`;
+                }).join('');
+            }
+            document.getElementById('friendHistoryModal').classList.remove('hidden');
+        }
+        
+        function closeFriendHistoryModal() {
+            document.getElementById('friendHistoryModal').classList.add('hidden');
+        }
+
+        function renderFriendsList() {
+            const list = document.getElementById('friendsList');
+            if (friends.length === 0) {
+                list.innerHTML = `<div class="text-center py-6 opacity-50"><p class="text-gray-500 font-bold dark:text-gray-400">No friends added yet.</p></div>`;
+                return;
+            }
+            list.innerHTML = friends.map(f => {
+                const bal = f.balance.toFixed(2);
+                let statusClass = "text-gray-400";
+                let statusText = "Settled";
+                if (f.balance > 0.01) { statusClass = "text-green-500"; statusText = `Owes you ₹${bal}`; } 
+                else if (f.balance < -0.01) { statusClass = "text-red-500"; statusText = `You owe ₹${Math.abs(bal)}`; }
+                
+                return `
+                <div class="flex items-center justify-between p-4 bg-white dark:bg-black rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors" onclick="viewFriendHistory('${f.id}')">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-gray-500 dark:text-gray-300">${f.name.charAt(0)}</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">${f.name}</h4>
+                            <p class="text-xs font-bold ${statusClass}">${statusText}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2" onclick="event.stopPropagation()">
+                         ${Math.abs(f.balance) > 0.01 ? `<button onclick="settleUp(${f.id})" class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold border border-blue-100">Settle</button>` : ''}
+                        <button onclick="deleteFriend(${f.id})" class="text-gray-300 hover:text-red-400">✕</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function updateNetBalance() {
+            let net = 0;
+            friends.forEach(f => net += f.balance);
+            const el = document.getElementById('splitNetBalance');
+            el.textContent = `₹${net.toFixed(2)}`;
+            if(net > 0) el.className = "text-4xl font-black text-green-500 mt-1";
+            else if (net < 0) el.className = "text-4xl font-black text-red-500 mt-1";
+            else el.className = "text-4xl font-black text-gray-800 dark:text-white mt-1";
         }
 
         function openSettings() {
@@ -590,23 +951,8 @@
         function renderCategoryList() {
             const list = document.getElementById('categoryListContainer');
             list.innerHTML = categories.map(cat => {
-                const iconHtml = cat.type === 'svg' 
-                    ? `<div class="w-8 h-8 rounded-full overflow-hidden">${cat.icon}</div>` 
-                    : cat.type === 'image'
-                        ? `<img src="${cat.icon}" class="w-12 h-12 rounded-xl object-cover border border-gray-100 dark:border-gray-700">`
-                        : `<span class="text-2xl">${cat.icon}</span>`;
-                        
-                return `
-                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-black rounded-2xl border-2 border-gray-100 dark:border-gray-800 shadow-sm">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-white dark:bg-gray-800 flex items-center justify-center shadow-inner text-xl border border-gray-100 dark:border-gray-700 overflow-hidden">${iconHtml}</div>
-                        <span class="font-bold text-lg text-dark dark:text-white">${cat.name}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="editCategory('${cat.id}')" class="btn-3d p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg border-b-4 border-blue-200 dark:border-blue-900">✏️</button>
-                        <button onclick="deleteCategory('${cat.id}')" class="btn-3d p-2 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-lg border-b-4 border-red-200 dark:border-red-900">🗑️</button>
-                    </div>
-                </div>`;
+                const iconHtml = cat.type === 'svg' ? `<div class="w-8 h-8 rounded-full overflow-hidden">${cat.icon}</div>` : cat.type === 'image' ? `<img src="${cat.icon}" class="w-12 h-12 rounded-xl object-cover border border-gray-100 dark:border-gray-700">` : `<span class="text-2xl">${cat.icon}</span>`;
+                return `<div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-black rounded-2xl border-2 border-gray-100 dark:border-gray-800 shadow-sm"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-white dark:bg-gray-800 flex items-center justify-center shadow-inner text-xl border border-gray-100 dark:border-gray-700 overflow-hidden">${iconHtml}</div><span class="font-bold text-lg text-dark dark:text-white">${cat.name}</span></div><div class="flex gap-2"><button onclick="editCategory('${cat.id}')" class="btn-3d p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg border-b-4 border-blue-200 dark:border-blue-900">✏️</button><button onclick="deleteCategory('${cat.id}')" class="btn-3d p-2 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-lg border-b-4 border-red-200 dark:border-red-900">🗑️</button></div></div>`;
             }).join('');
         }
         function openAddCategoryModal(catId = null) {
@@ -618,9 +964,9 @@
             modal.classList.remove('hidden');
             if (catId) {
                 const cat = categories.find(c => c.id === catId);
-                title.textContent = "Edit Tag"; nameInput.value = cat.name; currentGeneratedIcon = { icon: cat.icon, type: cat.type }; 
+                title.textContent = "Edit Category"; nameInput.value = cat.name; currentGeneratedIcon = { icon: cat.icon, type: cat.type }; 
                 preview.innerHTML = cat.type === 'svg' ? cat.icon : cat.type === 'image' ? `<img src="${cat.icon}" class="w-full h-full object-cover">` : cat.icon;
-            } else { title.textContent = "New Tag"; nameInput.value = ""; currentGeneratedIcon = null; preview.textContent = "❓"; }
+            } else { title.textContent = "New Category"; nameInput.value = ""; currentGeneratedIcon = null; preview.textContent = "❓"; }
         }
         function closeAddCategoryModal() { document.getElementById('addCategoryModal').classList.add('hidden'); }
         async function generateCategoryIcon() {
@@ -629,39 +975,21 @@
             const preview = document.getElementById('newCategoryIconPreview');
             if (!name) return alert("Give it a name first!");
             
-            btn.disabled = true; 
-            btn.innerHTML = `<span class="animate-spin">🔄</span> Creating...`; 
-            preview.innerHTML = '<span class="animate-bounce">🎨</span>';
-            
+            btn.disabled = true; btn.innerHTML = `<span class="animate-spin">🔄</span> Creating...`; preview.innerHTML = '<span class="animate-bounce">🎨</span>';
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${getApiKey()}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        instances: [{ prompt: `Realistic, cinematic, high quality photo representing the budget category: "${name}". Minimalist, clean background, icon style.` }],
-                        parameters: { sampleCount: 1 }
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ instances: [{ prompt: `Realistic, cinematic, high quality photo representing the budget category: "${name}". Minimalist, clean background, icon style.` }], parameters: { sampleCount: 1 } })
                 });
-                
                 if (!response.ok) throw new Error('Image generation failed');
                 const data = await response.json();
-                
                 if(data.predictions && data.predictions[0] && data.predictions[0].bytesBase64Encoded) {
                     const base64 = data.predictions[0].bytesBase64Encoded;
                     const imgUrl = `data:image/png;base64,${base64}`;
                     preview.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover" />`;
                     currentGeneratedIcon = { icon: imgUrl, type: 'image' };
                 } else { throw new Error("No image returned"); }
-                
-            } catch (err) { 
-                console.error(err); 
-                alert("Oops, AI hiccup. Switching to Emoji."); 
-                preview.textContent = "✨"; 
-                currentGeneratedIcon = { icon: "✨", type: "emoji" }; 
-            } finally { 
-                btn.disabled = false; 
-                btn.innerHTML = `<span>🎨 Magic Generate</span>`; 
-            }
+            } catch (err) { console.error(err); alert("Oops, AI hiccup. Switching to Emoji."); preview.textContent = "✨"; currentGeneratedIcon = { icon: "✨", type: "emoji" }; } finally { btn.disabled = false; btn.innerHTML = `<span>🎨 Magic Generate</span>`; }
         }
         function saveCategory() {
             const name = document.getElementById('newCategoryName').value.trim();
@@ -673,101 +1001,40 @@
             saveCategories(); closeAddCategoryModal(); renderCategoryList(); renderTransactions();
         }
         function editCategory(id) { openAddCategoryModal(id); }
-        function deleteCategory(id) { 
-            showConfirm("Delete this tag?", "danger", () => {
-                categories = categories.filter(c => c.id !== id); 
-                saveCategories(); 
-                renderCategoryList(); 
-            });
-        }
+        function deleteCategory(id) { showConfirm("Delete this category?", "danger", () => { categories = categories.filter(c => c.id !== id); saveCategories(); renderCategoryList(); }); }
 
-        // --- INVENTORY FUNCTIONS ---
-        function loadInventory() {
-            const stored = localStorage.getItem(INVENTORY_KEY);
-            inventory = stored ? JSON.parse(stored) : [];
-        }
+        function loadInventory() { const stored = localStorage.getItem(INVENTORY_KEY); inventory = stored ? JSON.parse(stored) : []; }
         function saveInventory() { localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory)); }
-        function openAddInventoryModal() { 
-            document.getElementById('addInventoryModal').classList.remove('hidden'); 
-            document.getElementById('invDate').valueAsDate = new Date();
-        }
+        function openAddInventoryModal() { document.getElementById('addInventoryModal').classList.remove('hidden'); document.getElementById('invDate').valueAsDate = new Date(); }
         function closeAddInventoryModal() { document.getElementById('addInventoryModal').classList.add('hidden'); }
-        
         function saveInventoryItem() {
             const name = document.getElementById('invName').value.trim();
             const price = parseFloat(document.getElementById('invPrice').value);
             const qty = document.getElementById('invQty').value;
             const unit = document.getElementById('invUnit').value;
             const dateVal = document.getElementById('invDate').value;
-            
             if (!name || isNaN(price)) return alert("Name & Price required!");
-            
-            const newItem = {
-                id: Date.now(),
-                name,
-                price,
-                qty: `${qty}${unit}`,
-                startDate: dateVal,
-                endDate: null,
-                active: true
-            };
-            inventory.push(newItem);
-            saveInventory();
-            closeAddInventoryModal();
-            renderInventory();
-            showStatus("Item Tracked! 📦", "success");
+            const newItem = { id: Date.now(), name, price, qty: `${qty}${unit}`, startDate: dateVal, endDate: null, active: true };
+            inventory.push(newItem); saveInventory(); closeAddInventoryModal(); renderInventory(); showStatus("Item Tracked! 📦", "success");
         }
-
-        // NEW: Show Confirm Modal
         function showConfirm(msg, type, callback) {
             document.getElementById('confirmMsg').textContent = msg;
             const btn = document.getElementById('confirmYesBtn');
             const modal = document.getElementById('confirmModal');
-            
-            if (type === 'danger') {
-                btn.className = "flex-1 btn-3d py-3 rounded-xl bg-red-500 text-white font-bold border-b-4 border-red-700";
-            } else {
-                btn.className = "flex-1 btn-3d py-3 rounded-xl bg-green-500 text-white font-bold border-b-4 border-green-700";
-            }
-            
+            if (type === 'danger') btn.className = "flex-1 btn-3d py-3 rounded-xl bg-red-500 text-white font-bold border-b-4 border-red-700";
+            else btn.className = "flex-1 btn-3d py-3 rounded-xl bg-theme-accent text-white font-bold border-b-4 border-theme-dark"; // Uses theme color
             modal.classList.remove('hidden');
             confirmCallback = callback;
         }
-
-        function closeConfirm() {
-            document.getElementById('confirmModal').classList.add('hidden');
-            confirmCallback = null;
-        }
-
+        function closeConfirm() { document.getElementById('confirmModal').classList.add('hidden'); confirmCallback = null; }
         function finishItem(id) {
             const item = inventory.find(i => i.id === id);
-            if(item) {
-                showConfirm("Finish this item?", "success", () => {
-                    item.active = false;
-                    item.endDate = new Date().toISOString().split('T')[0];
-                    saveInventory();
-                    renderInventory();
-                    showStatus("Finished! 🎉", "success");
-                });
-            }
+            if(item) { showConfirm("Finish this item?", "success", () => { item.active = false; item.endDate = new Date().toISOString().split('T')[0]; saveInventory(); renderInventory(); showStatus("Finished! 🎉", "success"); }); }
         }
-
-        function deleteInventoryItem(id) {
-            showConfirm("Delete this item record?", "danger", () => {
-                inventory = inventory.filter(i => i.id !== id);
-                saveInventory();
-                renderInventory();
-                showStatus("Deleted! 🗑️", "success");
-            });
-        }
-
+        function deleteInventoryItem(id) { showConfirm("Delete this item record?", "danger", () => { inventory = inventory.filter(i => i.id !== id); saveInventory(); renderInventory(); showStatus("Deleted! 🗑️", "success"); }); }
         function renderInventory() {
             const list = document.getElementById('inventoryListContainer');
-            if (inventory.length === 0) {
-                list.innerHTML = `<div class="text-center py-10 opacity-50 dark:text-white"><div class="text-4xl mb-2">📦</div><p>Empty Inventory</p></div>`;
-                return;
-            }
-            
+            if (inventory.length === 0) { list.innerHTML = `<div class="text-center py-10 opacity-50"><div class="text-4xl mb-2">📦</div><p>Empty Inventory</p></div>`; return; }
             const now = new Date();
             list.innerHTML = inventory.slice().reverse().map(item => {
                 const start = new Date(item.startDate);
@@ -775,35 +1042,14 @@
                 const diffTime = Math.abs(end - start);
                 const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1; 
                 const costPerDay = (item.price / days).toFixed(2);
-                
-                const statusColor = item.active ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300";
+                const statusColor = item.active ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600";
                 const statusText = item.active ? `Running: Day ${days}` : `Lasted: ${days} Days`;
-
-                return `
-                <div class="p-4 bg-gray-50 dark:bg-black rounded-2xl border-2 border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden">
-                    ${!item.active ? '<div class="absolute inset-0 bg-gray-50/50 dark:bg-black/50 z-10 pointer-events-none"></div>' : ''}
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h4 class="font-black text-lg text-dark dark:text-white">${item.name}</h4>
-                            <p class="text-xs font-bold text-gray-400">${item.qty} • ₹${item.price}</p>
-                        </div>
-                        <div class="flex gap-2 relative z-20">
-                            ${item.active ? `<button onclick="finishItem(${item.id})" class="p-2 bg-green-500 text-white rounded-lg btn-3d border-b-4 border-green-700">✓</button>` : ''}
-                            <button onclick="deleteInventoryItem(${item.id})" class="p-2 bg-red-100 text-red-500 rounded-lg btn-3d">🗑️</button>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center mt-3">
-                        <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${statusText}</span>
-                        <span class="text-xs font-bold text-gray-400">₹${costPerDay}/day</span>
-                    </div>
-                </div>`;
+                return `<div class="p-4 bg-gray-50 rounded-2xl border-2 border-gray-100 shadow-sm relative overflow-hidden">${!item.active ? '<div class="absolute inset-0 bg-gray-50/50 z-10 pointer-events-none"></div>' : ''}<div class="flex justify-between items-start mb-2"><div><h4 class="font-black text-lg text-dark">${item.name}</h4><p class="text-xs font-bold text-gray-400">${item.qty} • ₹${item.price}</p></div><div class="flex gap-2 relative z-20">${item.active ? `<button onclick="finishItem(${item.id})" class="p-2 bg-green-500 text-white rounded-lg btn-3d border-b-4 border-green-700">✓</button>` : ''}<button onclick="deleteInventoryItem(${item.id})" class="p-2 bg-red-100 text-red-500 rounded-lg btn-3d">🗑️</button></div></div><div class="flex justify-between items-center mt-3"><span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${statusText}</span><span class="text-xs font-bold text-gray-400">₹${costPerDay}/day</span></div></div>`;
             }).join('');
         }
 
-        // --- END INVENTORY FUNCTIONS ---
-
         function attachEventListeners() {
-            document.getElementById('voiceBtn').addEventListener('click', toggleVoiceMode);
+            document.getElementById('voiceBtn').addEventListener('click', () => toggleVoiceMode('main')); // Main FAB
             document.getElementById('manualBtn').addEventListener('click', toggleManualMode);
             document.getElementById('saveVoiceBtn').addEventListener('click', processVoiceEntryWithAI);
             document.getElementById('cancelVoiceBtn').addEventListener('click', cancelVoiceMode);
@@ -812,119 +1058,106 @@
             document.getElementById('todayBtn').addEventListener('click', () => switchViewMode('today'));
             document.getElementById('allBtn').addEventListener('click', () => switchViewMode('all'));
             document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-            document.getElementById('analyticsBtn').addEventListener('click', openInsights);
+            // document.getElementById('analyticsBtn').addEventListener('click', openInsights); // Replaced by Split
             document.getElementById('categoriesNavBtn').addEventListener('click', openCategoryManager);
             document.getElementById('settingsNavBtn').addEventListener('click', openSettings);
-            
-            // Confirm Modal Listeners
             document.getElementById('confirmNoBtn').addEventListener('click', closeConfirm);
-            document.getElementById('confirmYesBtn').addEventListener('click', () => {
-                if (confirmCallback) confirmCallback();
-                closeConfirm();
-            });
+            document.getElementById('confirmYesBtn').addEventListener('click', () => { if (confirmCallback) confirmCallback(); closeConfirm(); });
         }
+        
+        // Modified to handle voice context ('main' or 'split')
         async function processVoiceEntryWithAI() {
             const text = document.getElementById('voiceText').value.trim();
             if (!text || text === "Listening...") return showStatus('Speak up! 🗣️', 'error');
             document.getElementById('voiceStatusContainer').classList.add('hidden'); document.getElementById('aiProcessing').classList.remove('hidden'); document.getElementById('saveVoiceBtn').disabled = true;
+            
             try {
-                const availableCats = categories.map(c => c.name).join(', ');
-                const prompt = `Analyze transaction: "${text}". Extract: 1. Description, 2. Amount, 3. Category (match [${availableCats}] or 'Misc'). Return JSON: {"description": "...", "amount": 0.00, "category": "..."}.`;
+                let prompt = "";
+                if (currentVoiceContext === 'split') {
+                    // Split context logic
+                    const friendNames = friends.map(f => f.name).join(', ');
+                    prompt = `Analyze split bill transaction: "${text}". Today is ${new Date().toISOString()}. Friend list: [${friendNames}, Me]. Extract: 1. Amount, 2. Description, 3. Payer (Best match from friend list or "Me"), 4. Involved (List of best match names from friend list or "Me". If implied everyone, list all friends + "Me"), 5. Date (YYYY-MM-DD format, default to today if not specified). Return JSON: {"amount": 0, "desc": "...", "payer": "...", "involved": ["...", "..."], "date": "YYYY-MM-DD"}`;
+                } else {
+                    // Standard expense logic
+                    const availableCats = categories.map(c => c.name).join(', ');
+                    prompt = `Analyze transaction: "${text}". Extract: 1. Description, 2. Amount, 3. Category (match [${availableCats}] or 'Misc'). Return JSON: {"description": "...", "amount": 0.00, "category": "..."}.`;
+                }
+
                 const result = await callGemini(prompt);
                 const data = JSON.parse(result.replace(/```json/g, '').replace(/```/g, '').trim());
-                cancelVoiceMode(); manualMode = true; document.getElementById('manualInput').classList.remove("hidden");
-                document.getElementById('manualText').value = data.description || text;
-                document.getElementById('manualAmount').value = data.amount || '';
-                const select = document.getElementById('manualCategory');
-                if ([...select.options].some(o => o.value === data.category)) select.value = data.category;
-                showStatus('✨ Magic Done!', 'success');
-            } catch (err) { console.error(err); showStatus("AI confused, do it manually?", "error"); cancelVoiceMode(); toggleManualMode(); document.getElementById('manualText').value = text; } finally { document.getElementById('voiceStatusContainer').classList.remove('hidden'); document.getElementById('aiProcessing').classList.add('hidden'); document.getElementById('saveVoiceBtn').disabled = false; }
+                
+                cancelVoiceMode(); 
+
+                if (currentVoiceContext === 'split') {
+                    openAddSplitModal(); // Ensure form is visible
+                    document.getElementById('splitAmount').value = data.amount || '';
+                    document.getElementById('splitDesc').value = data.desc || text;
+                    
+                    // Set Date (from AI or default to today)
+                    if (data.date) {
+                         document.getElementById('splitDate').value = data.date;
+                    } else {
+                         document.getElementById('splitDate').valueAsDate = new Date();
+                    }
+
+                    // Match Payer
+                    let payerId = 'me';
+                    if (data.payer && data.payer.toLowerCase() !== 'me') {
+                         const match = friends.find(f => f.name.toLowerCase() === data.payer.toLowerCase());
+                         if (match) payerId = match.id;
+                    }
+                    selectPayerById(payerId);
+
+                    // Match Involved
+                    if (data.involved && Array.isArray(data.involved)) {
+                        // Uncheck all first
+                         document.querySelectorAll('#involvedList input[type="checkbox"]').forEach(cb => cb.checked = false);
+                         
+                         data.involved.forEach(name => {
+                             let id = null;
+                             if (name.toLowerCase() === 'me') id = 'me';
+                             else {
+                                 const match = friends.find(f => f.name.toLowerCase() === name.toLowerCase());
+                                 if (match) id = match.id;
+                             }
+                             if (id) {
+                                 const cb = document.getElementById(`split_${id}`);
+                                 if (cb) cb.checked = true;
+                             }
+                         });
+                    }
+
+                    showStatus('✨ Split Details Parsed!', 'success');
+                } else {
+                    // Main Expense Fill
+                    manualMode = true; document.getElementById('manualInput').classList.remove("hidden");
+                    document.getElementById('manualText').value = data.description || text;
+                    document.getElementById('manualAmount').value = data.amount || '';
+                    const select = document.getElementById('manualCategory');
+                    if ([...select.options].some(o => o.value === data.category)) select.value = data.category;
+                    showStatus('✨ Expense Parsed!', 'success');
+                }
+                
+            } catch (err) { console.error(err); showStatus("AI confused, please try again manually.", "error"); cancelVoiceMode(); } 
+            finally { document.getElementById('voiceStatusContainer').classList.remove('hidden'); document.getElementById('aiProcessing').classList.add('hidden'); document.getElementById('saveVoiceBtn').disabled = false; }
         }
         
-        async function openInsights() {
-            document.getElementById('insightsModal').classList.remove('hidden');
-            const entries = getAllEntries(); 
-            const content = document.getElementById('insightsContent');
-            const chartCanvas = document.getElementById('budgetChart');
-            const legendContainer = document.getElementById('chartLegend');
-            
-            content.innerHTML = '<div class="flex flex-col items-center justify-center py-4 text-purple-600"><span class="animate-bounce font-bold">✨ AI is Thinking...</span></div>';
-            legendContainer.innerHTML = '';
-            
-            const ctx = chartCanvas.getContext('2d');
-            ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+        function toggleVoiceMode(context = 'main') {
+            currentVoiceContext = context;
+            const hintText = context === 'split' ? 'Say: "Rahul paid 2000 for dinner yesterday"' : 'Say: "Burger 150 Rupees"';
+            document.getElementById('voiceHint').innerText = hintText;
 
-            if (entries.length === 0) { 
-                content.innerHTML = '<div class="text-center p-4">No data yet! Spend some money! 💸</div>';
-                document.getElementById('chartTotal').textContent = "₹0";
-                return; 
-            }
-            
-            const catTotals = {}; 
-            let total = 0;
-            entries.forEach(e => { const amt = parseFloat(e.amount) || 0; catTotals[e.category] = (catTotals[e.category] || 0) + amt; total += amt; });
-            document.getElementById('chartTotal').textContent = `₹${total.toFixed(0)}`;
-
-            const sortedCats = Object.entries(catTotals).sort((a,b) => b[1] - a[1]);
-            const chartData = sortedCats.map(([label, value], i) => ({
-                label, value, color: CHART_COLORS[i % CHART_COLORS.length]
-            }));
-
-            drawDonutChart(ctx, chartData, total);
-
-            legendContainer.innerHTML = chartData.map(item => {
-                const pct = ((item.value / total) * 100).toFixed(1);
-                return `
-                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-black rounded-xl border border-gray-100 dark:border-gray-800">
-                    <div class="flex items-center gap-3">
-                        <div class="w-4 h-4 rounded-full border-2 border-white shadow-sm" style="background-color: ${item.color}"></div>
-                        <span class="text-sm font-bold text-dark dark:text-white">${item.label}</span>
-                    </div>
-                    <div class="text-sm font-bold text-gray-600 dark:text-gray-400">
-                        ₹${item.value} <span class="text-xs font-normal opacity-70">(${pct}%)</span>
-                    </div>
-                </div>`;
-            }).join('');
-
-            try {
-                const recent = entries.slice(0, 15);
-                const prompt = `Analyze last ${recent.length} expenses: ${JSON.stringify(recent)}. Summarize: Highest category and a short, funny friendly tip. Use markdown, emojis. < 50 words. Be like a supportive cartoon character.`;
-                const result = await callGemini(prompt);
-                content.innerHTML = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-            } catch (err) { content.innerHTML = '<div class="text-center text-red-400 text-xs">AI Sleeping (Check Key)</div>'; }
+            if (manualMode) cancelManualMode(); 
+            if (voiceMode) { 
+                if (isListening && recognition) recognition.abort(); 
+                cancelVoiceMode(); 
+            } else { 
+                voiceMode = true; 
+                document.getElementById("voiceInput").classList.remove("hidden"); 
+                document.getElementById("voiceText").value = ""; 
+                if (recognition) try { recognition.start(); } catch (err) { console.error(err); cancelVoiceMode(); } 
+            } 
         }
-
-        function drawDonutChart(ctx, data, total) {
-            const centerX = 128; const centerY = 128; const radius = 100; const innerRadius = 60;
-            let startAngle = -0.5 * Math.PI;
-            let progress = 0;
-            function animate() {
-                progress += 0.05; if (progress > 1) progress = 1;
-                ctx.clearRect(0, 0, 256, 256);
-                let currentAngle = startAngle;
-
-                data.forEach(slice => {
-                    const sliceAngle = (slice.value / total) * 2 * Math.PI;
-                    const drawAngle = sliceAngle * progress;
-
-                    ctx.beginPath();
-                    ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + drawAngle);
-                    ctx.arc(centerX, centerY, innerRadius, currentAngle + drawAngle, currentAngle, true);
-                    ctx.closePath();
-                    ctx.fillStyle = slice.color;
-                    ctx.fill();
-                    ctx.strokeStyle = document.documentElement.classList.contains('dark') ? '#1E293B' : '#ffffff';
-                    ctx.lineWidth = 6;
-                    ctx.stroke();
-                    currentAngle += sliceAngle;
-                });
-                if (progress < 1) requestAnimationFrame(animate);
-            }
-            animate();
-        }
-
-        function closeInsights() { document.getElementById('insightsModal').classList.add('hidden'); }
-        function toggleVoiceMode() { if (manualMode) cancelManualMode(); if (voiceMode) { if (isListening && recognition) recognition.abort(); cancelVoiceMode(); } else { voiceMode = true; document.getElementById("voiceInput").classList.remove("hidden"); document.getElementById("voiceText").value = ""; if (recognition) try { recognition.start(); } catch (err) { console.error(err); cancelVoiceMode(); } } }
         function cancelVoiceMode() { voiceMode = false; if (isListening) recognition.abort(); document.getElementById('voiceInput').classList.add('hidden'); }
         function toggleManualMode() { if (voiceMode) cancelVoiceMode(); if (manualMode) cancelManualMode(); else { manualMode = true; document.getElementById('manualInput').classList.remove("hidden"); document.getElementById('manualText').focus(); } }
         function saveManualEntry() {
@@ -938,8 +1171,6 @@
             cancelManualMode(); renderTransactions();
         }
         function cancelManualMode() { manualMode = false; editingEntryId = null; document.getElementById("manualInput").classList.add("hidden"); document.getElementById("manualText").value = ""; document.getElementById("manualAmount").value = ""; if(categories.length > 0) document.getElementById("manualCategory").value = categories[0].name; document.getElementById("saveManualBtn").textContent = "Add It! 💰"; }
-        function initTheme() { const html = document.documentElement; if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { html.classList.add('dark'); document.getElementById('moonIcon').classList.add('hidden'); document.getElementById('sunIcon').classList.remove('hidden'); } else { html.classList.remove('dark'); document.getElementById('moonIcon').classList.remove('hidden'); document.getElementById('sunIcon').classList.add('hidden'); } }
-        function toggleTheme() { const html = document.documentElement; if (html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.theme = 'light'; document.getElementById('moonIcon').classList.remove('hidden'); document.getElementById('sunIcon').classList.add('hidden'); } else { html.classList.add('dark'); localStorage.theme = 'dark'; document.getElementById('moonIcon').classList.add('hidden'); document.getElementById('sunIcon').classList.remove('hidden'); } }
         
         function getStorageStructure() { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
         function saveToStorage(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); updateDashboardCard(); }
@@ -975,7 +1206,7 @@
             const idx = list.findIndex(e => e.id === id); if(idx === -1) return; list.splice(idx, 1);
             if(list.length===0) { delete s[y][m][d]; if(Object.keys(s[y][m]).length===0) delete s[y][m]; if(Object.keys(s[y]).length===0) delete s[y]; } saveToStorage(s);
         }
-        function confirmDeleteEntry(id, date) { if(confirm("Delete?")) { deleteEntryById(id, date); showStatus("Poof! Gone! 💨", "success"); renderTransactions(); } }
+        function confirmDeleteEntry(id, date) { showConfirm("Delete?", "danger", () => { deleteEntryById(id, date); renderTransactions(); showStatus("Poof! Gone! 💨", "success"); }); }
         function startEditEntry(id, date) {
             const s = getStorageStructure(); const [y,m,d] = date.split('-'); const entry = s[y]?.[m]?.[d]?.find(e => e.id === id); if(!entry) return;
             editingEntryId = id; if(voiceMode) cancelVoiceMode(); manualMode = true; document.getElementById("manualInput").classList.remove("hidden");
@@ -1003,30 +1234,11 @@
                 const cat = categories.find(c => c.name === e.category);
                 const icon = cat ? (cat.type === 'svg' ? `<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm">${cat.icon}</div>` : cat.type === 'image' ? `<img src="${cat.icon}" class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 object-cover shadow-md border-2 border-gray-50 dark:border-gray-700">` : `<div class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center text-xl shadow-md border-2 border-gray-50 dark:border-gray-700">${cat.icon}</div>`) : `<div class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center text-xl shadow-md border-2 border-gray-50 dark:border-gray-700">🛒</div>`;
                 const amount = e.amount ? `<span class="font-black text-red-500">-₹${e.amount}</span>` : '';
-                
-                let formattedDate = e.date || "Error"; let formattedTime = e.time || "";
-                if (e.timestamp) { const d = new Date(e.timestamp); if (!isNaN(d.getTime())) { formattedDate = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`; formattedTime = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; } }
-                
-                return `
-                <div class="flex items-center justify-between p-4 bg-white dark:bg-nightSurface rounded-[20px] shadow-[0_4px_0_0_rgba(0,0,0,0.05)] border-2 border-gray-100 dark:border-gray-800 hover:translate-y-[-2px] hover:shadow-md transition-all">
-                    <div class="flex items-center gap-4">
-                        ${icon}
-                        <div>
-                            <h4 class="font-extrabold text-sm text-gray-700 dark:text-white line-clamp-1">${escapeHtml(e.description || e.text || "No Description")}</h4>
-                            <p class="text-[10px] font-bold text-gray-400 mt-0.5">${formattedDate} • ${amount}</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-1">
-                        <button onclick="startEditEntry(${e.id}, '${e.date}')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-black text-blue-400 hover:bg-blue-100">✏️</button>
-                        <button onclick="confirmDeleteEntry(${e.id}, '${e.date}')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-black text-red-400 hover:bg-red-100">✕</button>
-                    </div>
-                </div>`;
+                let formattedDate = e.date || "Error"; 
+                if (e.timestamp) { const d = new Date(e.timestamp); if (!isNaN(d.getTime())) { formattedDate = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`; } }
+                return `<div class="flex items-center justify-between p-4 bg-white dark:bg-nightSurface rounded-[20px] shadow-[0_4px_0_0_rgba(0,0,0,0.05)] border-2 border-gray-100 dark:border-gray-800 hover:translate-y-[-2px] hover:shadow-md transition-all"><div class="flex items-center gap-4">${icon}<div><h4 class="font-extrabold text-sm text-gray-700 dark:text-white line-clamp-1">${escapeHtml(e.description || e.text || "No Description")}</h4><p class="text-[10px] font-bold text-gray-400 mt-0.5">${formattedDate} • ${amount}</p></div></div><div class="flex gap-1"><button onclick="startEditEntry(${e.id}, '${e.date}')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-black text-blue-400 hover:bg-blue-100">✏️</button><button onclick="confirmDeleteEntry(${e.id}, '${e.date}')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-black text-red-400 hover:bg-red-100">✕</button></div></div>`;
             }).join("") : `<div class="text-center py-10 opacity-60"><div class="text-6xl mb-4 animate-bounce">🎈</div><p class="text-sm font-bold dark:text-gray-400">Nothing here yet!</p></div>`;
-            
-            if(total > 1) {
-                document.getElementById('pagination').innerHTML = `<button class="px-4 py-2 bg-white dark:bg-black border-2 border-gray-100 dark:border-gray-800 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-300 disabled:opacity-30 shadow-3d active:shadow-none active:translate-y-1 transition-all" onclick="changePage(-1)" ${currentPage===0?'disabled':''}>Prev</button><button class="px-4 py-2 bg-white dark:bg-black border-2 border-gray-100 dark:border-gray-800 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-300 disabled:opacity-30 shadow-3d active:shadow-none active:translate-y-1 transition-all" onclick="changePage(1)" ${currentPage===total-1?'disabled':''}>Next</button>`;
-                document.getElementById('paginationInfo').textContent = `Page ${currentPage+1} of ${total}`;
-            } else { document.getElementById('pagination').innerHTML = ''; document.getElementById('paginationInfo').textContent = ''; }
+            if(total > 1) { document.getElementById('pagination').innerHTML = `<button class="px-4 py-2 bg-white dark:bg-black border-2 border-gray-100 dark:border-gray-800 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-300 disabled:opacity-30 shadow-3d active:shadow-none active:translate-y-1 transition-all" onclick="changePage(-1)" ${currentPage===0?'disabled':''}>Prev</button><button class="px-4 py-2 bg-white dark:bg-black border-2 border-gray-100 dark:border-gray-800 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-300 disabled:opacity-30 shadow-3d active:shadow-none active:translate-y-1 transition-all" onclick="changePage(1)" ${currentPage===total-1?'disabled':''}>Next</button>`; document.getElementById('paginationInfo').textContent = `Page ${currentPage+1} of ${total}`; } else { document.getElementById('pagination').innerHTML = ''; document.getElementById('paginationInfo').textContent = ''; }
         }
         function changePage(dir) { currentPage += dir; renderTransactions(); }
         function updateDateDisplay() { document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', {weekday: 'long', month:'short',day:'numeric'}); }
